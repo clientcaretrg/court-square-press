@@ -14,8 +14,6 @@
     --fg: #1f1f1d;
     --muted: #6b6a65;
     --accent: #1f4e79;
-    --accent-soft: #c9d8e8;
-    --pos: #2f7d4f;
     --radius: 10px;
   }
   * { box-sizing: border-box; }
@@ -26,30 +24,25 @@
   p { margin: 0; }
   .muted { color: var(--muted); font-size: 13px; }
   .sub { color: var(--muted); margin-top: 4px; }
-  .tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr)); gap: 12px; }
-  .card { background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); padding: 18px; display: flex; flex-direction: column; gap: 10px; min-width: 0; }
-  .tile-label { color: var(--muted); font-size: 13px; }
-  .big { font-family: "Source Serif 4", Georgia, serif; font-size: 28px; font-variant-numeric: tabular-nums; }
-  .tiles.mini { grid-template-columns: repeat(auto-fit, minmax(min(100%, 140px), 1fr)); gap: 10px; }
-  .tiles.mini .card { background: var(--bg); padding: 12px 14px; gap: 4px; }
-  .tiles.mini .big { font-size: 22px; }
-  .grid2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 460px), 1fr)); gap: 12px; }
-  .scroll { overflow: auto; max-height: 420px; border-radius: 6px; }
-  .scroll.tall { max-height: 560px; }
+  .card { background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); padding: 18px; display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+  .tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 140px), 1fr)); gap: 10px; }
+  .tile { background: var(--bg); border: 1px solid var(--line); border-radius: 8px; padding: 12px 14px; display: flex; flex-direction: column; gap: 2px; }
+  .tile-label { color: var(--muted); font-size: 12px; }
+  .big { font-family: "Source Serif 4", Georgia, serif; font-size: 22px; font-variant-numeric: tabular-nums; }
+  .controls { display: flex; flex-wrap: wrap; gap: 8px; }
+  .controls select { font: inherit; font-size: 13px; padding: 7px 10px; border: 1px solid var(--line); border-radius: 6px; background: #fff; color: var(--fg); flex: 1 1 140px; min-width: 0; }
+  .controls select#period { flex: 2 1 200px; font-weight: 500; }
+  .scroll { overflow: auto; max-height: 520px; border-radius: 6px; border: 1px solid var(--line); background: var(--bg); }
   table { border-collapse: collapse; width: 100%; font-size: 13px; font-variant-numeric: tabular-nums; }
   th, td { padding: 7px 10px; border-bottom: 1px solid var(--line); text-align: right; white-space: nowrap; }
   th:first-child, td:first-child { text-align: left; }
-  th { position: sticky; top: 0; background: var(--panel); color: var(--muted); font-weight: 500; z-index: 1; vertical-align: bottom; }
+  th { position: sticky; top: 0; background: var(--bg); color: var(--muted); font-weight: 500; z-index: 1; }
   td.left, th.left { text-align: left; }
-  tbody tr:hover td { background: #eeede9; }
-  .pos { color: var(--pos); font-weight: 500; }
+  tbody tr:hover td { background: var(--panel); }
   .sort { all: unset; cursor: pointer; }
   .sort:hover { color: var(--fg); }
   th[aria-sort="ascending"] .sort::after { content: " \2191"; }
   th[aria-sort="descending"] .sort::after { content: " \2193"; }
-  .controls { display: flex; flex-wrap: wrap; gap: 8px; }
-  .controls input, .controls select { font: inherit; font-size: 13px; padding: 7px 10px; border: 1px solid var(--line); border-radius: 6px; background: #fff; color: var(--fg); }
-  .controls input { flex: 1 1 180px; min-width: 0; }
   .chart { position: relative; min-height: 260px; }
   .tip { position: absolute; pointer-events: none; background: #fff; border: 1px solid var(--line); border-radius: 6px; box-shadow: 0 4px 14px rgba(0,0,0,.12); padding: 6px 10px; font-size: 12px; white-space: nowrap; display: none; }
   .tip .k { color: var(--muted); }
@@ -63,113 +56,32 @@
     <p class="sub">Court Square Press, South Boston. Every closed condo sale, <span id="yr-range"></span>.</p>
   </header>
 
-  <div class="tiles">
-    <div class="card"><span class="tile-label">Closed sales, all years</span><span class="big" id="t-sales"></span></div>
-    <div class="card"><span class="tile-label">Median sale price since <span class="recent"></span></span><span class="big" id="t-med"></span></div>
-    <div class="card"><span class="tile-label">Median $/SF since <span class="recent"></span></span><span class="big" id="t-psf"></span></div>
-    <div class="card"><span class="tile-label">Sales that included parking</span><span class="big" id="t-park"></span></div>
-  </div>
-
-  <section class="card" id="recent-sales">
-    <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:baseline;justify-content:space-between">
-      <h2>Recent sales</h2>
-      <div class="controls">
-        <select id="period" aria-label="Period"></select>
-      </div>
-    </div>
-    <p class="muted" id="recent-count"></p>
-    <div class="tiles mini">
-      <div class="card"><span class="tile-label">Sales</span><span class="big" id="r-sales"></span></div>
-      <div class="card"><span class="tile-label">Median sale price</span><span class="big" id="r-med"></span></div>
-      <div class="card"><span class="tile-label">Median $/SF</span><span class="big" id="r-psf"></span></div>
-      <div class="card"><span class="tile-label">Median size</span><span class="big" id="r-sf"></span></div>
-      <div class="card"><span class="tile-label">Median days on market</span><span class="big" id="r-dom"></span></div>
-      <div class="card"><span class="tile-label">Avg sale to list</span><span class="big" id="r-sp"></span></div>
-    </div>
-    <p class="muted" id="recent-mix"></p>
-    <div class="scroll">
-      <table>
-        <thead><tr><th>Closed</th><th>Unit</th><th>Floor</th><th>Beds</th><th>Baths</th><th>SF</th><th class="left">Parking</th><th>List price</th><th>Sale price</th><th>$/SF</th><th>SP/LP %</th><th>DOM</th></tr></thead>
-        <tbody id="recent-body"></tbody>
-      </table>
-    </div>
-  </section>
-
-  <section class="card">
-    <h2>By year</h2>
-    <p class="muted">Median sale price per year. Hover or tap a bar for details.</p>
-    <div class="chart" id="year-chart"><div class="tip" id="tip"></div></div>
-    <div class="scroll">
-      <table>
-        <thead><tr><th>Year</th><th>Sales</th><th>Studio</th><th>1 BR</th><th>2 BR</th><th>3 BR</th><th>With parking</th><th>Median price</th><th>Low</th><th>High</th><th>Median $/SF</th><th>Median DOM</th></tr></thead>
-        <tbody id="year-body"></tbody>
-      </table>
-    </div>
-  </section>
-
-  <div class="grid2">
-    <section class="card">
-      <h2>By bedrooms</h2>
-      <p class="muted">All years, plus the median since <span class="recent"></span> for a current read.</p>
-      <div class="scroll">
-        <table>
-          <thead><tr><th>Beds</th><th>Sales</th><th>Median SF</th><th>Median price</th><th>Low</th><th>High</th><th>Median $/SF</th><th>Sales since <span class="recent"></span></th><th>Median since <span class="recent"></span></th></tr></thead>
-          <tbody id="beds-body"></tbody>
-        </table>
-      </div>
-    </section>
-
-    <section class="card">
-      <h2>By unit level</h2>
-      <p class="muted">Floor is the first digit of the unit number (unit 412 is floor 4).</p>
-      <div class="scroll">
-        <table>
-          <thead><tr><th>Floor</th><th>Sales</th><th>Studio</th><th>1 BR</th><th>2 BR</th><th>3 BR</th><th>With parking</th><th>Median price</th><th>Median $/SF</th></tr></thead>
-          <tbody id="floor-body"></tbody>
-        </table>
-      </div>
-    </section>
-  </div>
-
-  <section class="card">
-    <h2>With or without parking</h2>
-    <p class="muted">Counts are all years. Prices compare sales since <span class="parkfrom"></span> only, so older sales don't skew the comparison. "With parking" means the listing showed at least one garage or parking space.</p>
-    <div class="scroll">
-      <table>
-        <thead><tr><th>Beds</th><th>Sold with parking</th><th>Sold without</th><th>Median with, since <span class="parkfrom"></span></th><th>Median without, since <span class="parkfrom"></span></th><th>Parking premium</th><th>$/SF with</th><th>$/SF without</th></tr></thead>
-        <tbody id="park-body"></tbody>
-      </table>
-    </div>
-  </section>
-
-  <section class="card" id="all-sales">
-    <h2>All sales</h2>
-    <p class="muted">Click a column to sort. <span id="shown"></span></p>
+  <section class="card" id="sales">
+    <h2>Sales</h2>
     <div class="controls">
-      <input id="q" type="search" placeholder="Search unit or MLS #" aria-label="Search">
+      <select id="period" aria-label="Period"></select>
       <select class="f" data-k="beds" aria-label="Bedrooms"><option value="">All beds</option><option>Studio</option><option>1 BR</option><option>2 BR</option><option>3 BR</option></select>
       <select class="f" data-k="pk" aria-label="Parking"><option value="">Any parking</option><option value="0">No parking</option><option value="1">1 space</option><option value="2">2 spaces</option><option value="3">3+ spaces</option></select>
       <select class="f" data-k="floor" aria-label="Floor"><option value="">All floors</option><option value="1">Floor 1</option><option value="2">Floor 2</option><option value="3">Floor 3</option><option value="4">Floor 4</option><option value="5">Floor 5</option><option value="6">Floor 6</option></select>
     </div>
-    <div class="tiles mini">
-      <div class="card"><span class="tile-label">Sales</span><span class="big" id="a-sales"></span></div>
-      <div class="card"><span class="tile-label">Median sale price</span><span class="big" id="a-med"></span></div>
-      <div class="card"><span class="tile-label">Median $/SF</span><span class="big" id="a-psf"></span></div>
-      <div class="card"><span class="tile-label">Median size</span><span class="big" id="a-sf"></span></div>
-      <div class="card"><span class="tile-label">Median days on market</span><span class="big" id="a-dom"></span></div>
-      <div class="card"><span class="tile-label">Avg sale to list</span><span class="big" id="a-sp"></span></div>
+    <div class="tiles">
+      <div class="tile"><span class="tile-label">Sales</span><span class="big" id="t-sales"></span></div>
+      <div class="tile"><span class="tile-label">Median sale price</span><span class="big" id="t-med"></span></div>
+      <div class="tile"><span class="tile-label">Median $/SF</span><span class="big" id="t-psf"></span></div>
+      <div class="tile"><span class="tile-label">Median size</span><span class="big" id="t-sf"></span></div>
+      <div class="tile"><span class="tile-label">Median days on market</span><span class="big" id="t-dom"></span></div>
+      <div class="tile"><span class="tile-label">Avg sale to list</span><span class="big" id="t-sp"></span></div>
     </div>
-    <p class="muted" id="a-mix"></p>
-    <div class="scroll tall">
+    <p class="muted" id="mix"></p>
+    <div class="scroll">
       <table>
         <thead><tr>
-          <th><button class="sort" data-k="mls">MLS #</button></th>
-          <th><button class="sort" data-k="unit">Unit</button></th>
           <th aria-sort="descending"><button class="sort" data-k="closed">Closed</button></th>
+          <th><button class="sort" data-k="unit">Unit</button></th>
+          <th><button class="sort" data-k="floor">Floor</button></th>
           <th><button class="sort" data-k="bedrooms">Beds</button></th>
           <th><button class="sort" data-k="baths">Baths</button></th>
           <th><button class="sort" data-k="sqft">SF</button></th>
-          <th><button class="sort" data-k="floor">Floor</button></th>
           <th class="left"><button class="sort" data-k="spaces">Parking</button></th>
           <th><button class="sort" data-k="list_price">List price</button></th>
           <th><button class="sort" data-k="sale_price">Sale price</button></th>
@@ -182,35 +94,40 @@
     </div>
   </section>
 
-  <p class="foot">Source: MLS PIN closed sales export, data through <span id="last-close"></span>. Information deemed reliable but not guaranteed.</p>
+  <section class="card" id="by-year">
+    <h2>Year by year</h2>
+    <p class="muted">Median sale price per year. Hover for details, click a bar to see that year's sales.</p>
+    <div class="chart" id="year-chart"><div class="tip" id="tip"></div></div>
+    <div class="scroll">
+      <table>
+        <thead><tr><th>Year</th><th>Sales</th><th>1 BR</th><th>2 BR</th><th>Other</th><th>With parking</th><th>Median price</th><th>Median $/SF</th><th>Median DOM</th><th>Volume</th></tr></thead>
+        <tbody id="year-body"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <p class="foot">Source: MLS PIN closed sales, data through <span id="last-close"></span>. Floor is the first digit of the unit number. Parking is the number of garage or parking spaces on the listing. Information deemed reliable but not guaranteed.</p>
 </div>
 
 <script>
 const SALES = [{"mls":"73519931","unit":"322","closed":"2026-10-09","year":2026,"beds":"2 BR","bedrooms":2,"baths":2,"sqft":1296,"floor":3,"parking":"With parking","spaces":2,"list_price":945000,"sale_price":925000,"ppsf":714,"sale_to_list":97.9,"dom":138},{"mls":"73484434","unit":"214","closed":"2026-07-31","year":2026,"beds":"1 BR","bedrooms":1,"baths":2,"sqft":818,"floor":2,"parking":"No parking","spaces":0,"list_price":694000,"sale_price":685000,"ppsf":837,"sale_to_list":98.7,"dom":52},{"mls":"73506307","unit":"514","closed":"2026-07-09","year":2026,"beds":"1 BR","bedrooms":1,"baths":2,"sqft":815,"floor":5,"parking":"With parking","spaces":1,"list_price":769000,"sale_price":769000,"ppsf":944,"sale_to_list":100.0,"dom":0},{"mls":"73491188","unit":"404","closed":"2026-07-01","year":2026,"beds":"2 BR","bedrooms":2,"baths":2,"sqft":1219,"floor":4,"parking":"With parking","spaces":1,"list_price":950000,"sale_price":920000,"ppsf":755,"sale_to_list":96.8,"dom":79},{"mls":"73508242","unit":"210","closed":"2026-06-25","year":2026,"beds":"1 BR","bedrooms":1,"baths":2,"sqft":1175,"floor":2,"parking":"With parking","spaces":1,"list_price":935000,"sale_price":920000,"ppsf":783,"sale_to_list":98.4,"dom":38},{"mls":"73488016","unit":"117","closed":"2026-06-08","year":2026,"beds":"1 BR","bedrooms":1,"baths":1,"sqft":779,"floor":1,"parking":"With parking","spaces":2,"list_price":735000,"sale_price":730000,"ppsf":937,"sale_to_list":99.3,"dom":16},{"mls":"73455537","unit":"206","closed":"2026-05-11","year":2026,"beds":"1 BR","bedrooms":1,"baths":2,"sqft":1129,"floor":2,"parking":"With parking","spaces":1,"list_price":935000,"sale_price":915000,"ppsf":810,"sale_to_list":97.9,"dom":126},{"mls":"73474187","unit":"316","closed":"2026-04-17","year":2026,"beds":"2 BR","bedrooms":2,"baths":2,"sqft":920,"floor":3,"parking":"With parking","spaces":1,"list_price":849000,"sale_price":805000,"ppsf":875,"sale_to_list":94.8,"dom":43},{"mls":"73430004","unit":"314","closed":"2026-03-27","year":2026,"beds":"1 BR","bedrooms":1,"baths":2,"sqft":818,"floor":3,"parking":"With parking","spaces":1,"list_price":739000,"sale_price":716000,"ppsf":875,"sale_to_list":96.9,"dom":138},{"mls":"73336078","unit":"423","closed":"2025-09-09","year":2025,"beds":"1 BR","bedrooms":1,"baths":1,"sqft":837,"floor":4,"parking":"With parking","spaces":1,"list_price":725000,"sale_price":710000,"ppsf":848,"sale_to_list":97.9,"dom":187},{"mls":"73393217","unit":"106","closed":"2025-08-27","year":2025,"beds":"2 BR","bedrooms":2,"baths":2,"sqft":1139,"floor":1,"parking":"With parking","spaces":1,"list_price":899000,"sale_price":910000,"ppsf":799,"sale_to_list":101.2,"dom":36},{"mls":"73356953","unit":"425","closed":"2025-07-10","year":2025,"beds":"2 BR","bedrooms":2,"baths":2,"sqft":1042,"floor":4,"parking":"With parking","spaces":2,"list_price":889000,"sale_price":840000,"ppsf":806,"sale_to_list":94.5,"dom":59},{"mls":"73373853","unit":"518","closed":"2025-06-20","year":2025,"beds":"1 BR","bedrooms":1,"baths":2,"sqft":838,"floor":5,"parking":"With parking","spaces":1,"list_price":749000,"sale_price":743700,"ppsf":887,"sale_to_list":99.3,"dom":20},{"mls":"73338180","unit":"309","closed":"2025-05-01","year":2025,"beds":"1 BR","bedrooms":1,"baths":1,"sqft":862,"floor":3,"parking":"With parking","spaces":1,"list_price":729000,"sale_price":744000,"ppsf":863,"sale_to_list":102.1,"dom":17},{"mls":"73294939","unit":"104","closed":"2024-12-20","year":2024,"beds":"2 BR","bedrooms":2,"baths":2,"sqft":1226,"floor":1,"parking":"With parking","spaces":1,"list_price":969000,"sale_price":945000,"ppsf":771,"sale_to_list":97.5,"dom":82},{"mls":"73235771","unit":"210","closed":"2024-10-21","year":2024,"beds":"1 BR","bedrooms":1,"baths":2,"sqft":1175,"floor":2,"parking":"With parking","spaces":2,"list_price":925000,"sale_price":895000,"ppsf":762,"sale_to_list":96.8,"dom":44},{"mls":"73262990","unit":"PH601","closed":"2024-10-07","year":2024,"beds":"3 BR","bedrooms":3,"baths":2,"sqft":2114,"floor":6,"parking":"With parking","spaces":2,"list_price":2199000,"sale_price":2200000,"ppsf":1041,"sale_to_list":100.0,"dom":16},{"mls":"73242821","unit":"512","closed":"2024-09-20","year":2024,"beds":"2 BR","bedrooms":2,"baths":2,"sqft":1454,"floor":5,"parking":"With parking","spaces":2,"list_price":1295000,"sale_price":1215000,"ppsf":836,"sale_to_list":93.8,"dom":111},{"mls":"73200403","unit":"108","closed":"2024-08-15","year":2024,"beds":"1 BR","bedrooms":1,"baths":1,"sqft":858,"floor":1,"parking":"No parking","spaces":0,"list_price":675000,"sale_price":650000,"ppsf":758,"sale_to_list":96.3,"dom":44},{"mls":"73224823","unit":"610","closed":"2024-07-02","year":2024,"beds":"2 BR","bedrooms":2,"baths":2,"sqft":1159,"floor":6,"parking":"With parking","spaces":1,"list_price":999999,"sale_price":995000,"ppsf":858,"sale_to_list":99.5,"dom":20},{"mls":"73219903","unit":"211","closed":"2024-05-21","year":2024,"beds":"2 BR","bedrooms":2,"baths":2,"sqft":1280,"floor":2,"parking":"With parking","spaces":1,"list_price":1049000,"sale_price":1050000,"ppsf":820,"sale_to_list":100.1,"dom":15},{"mls":"73199732","unit":"408","closed":"2024-04-12","year":2024,"beds":"1 BR","bedrooms":1,"baths":1,"sqft":847,"floor":4,"parking":"With parking","spaces":1,"list_price":699000,"sale_price":685000,"ppsf":809,"sale_to_list":98.0,"dom":23},{"mls":"73162050","unit":"516","closed":"2023-12-28","year":2023,"beds":"1 BR","bedrooms":1,"baths":2,"sqft":931,"floor":5,"parking":"With parking","spaces":1,"list_price":829000,"sale_price":820000,"ppsf":881,"sale_to_list":98.9,"dom":54},{"mls":"73097216","unit":"525","closed":"2023-08-16","year":2023,"beds":"2 BR","bedrooms":2,"baths":2,"sqft":1060,"floor":5,"parking":"With parking","spaces":1,"list_price":949000,"sale_price":930000,"ppsf":877,"sale_to_list":98.0,"dom":85},{"mls":"73122100","unit":"514","closed":"2023-08-10","year":2023,"beds":"1 BR","bedrooms":1,"baths":2,"sqft":815,"floor":5,"parking":"With parking","spaces":1,"list_price":719900,"sale_price":719900,"ppsf":883,"sale_to_list":100.0,"dom":13},{"mls":"73070020","unit":"312","closed":"2023-06-16","year":2023,"beds":"2 BR","bedrooms":2,"baths":2,"sqft":1435,"floor":3,"parking":"With parking","spaces":1,"list_price":1245000,"sale_price":1225000,"ppsf":854,"sale_to_list":98.4,"dom":131},{"mls":"73092734","unit":"413","closed":"2023-05-24","year":2023,"beds":"1 BR","bedrooms":1,"baths":1,"sqft":763,"floor":4,"parking":"No parking","spaces":0,"list_price":649000,"sale_price":649000,"ppsf":851,"sale_to_list":100.0,"dom":23},{"mls":"73090483","unit":"300","closed":"2023-05-12","year":2023,"beds":"1 BR","bedrooms":1,"baths":2,"sqft":1033,"floor":3,"parking":"With parking","spaces":1,"list_price":775000,"sale_price":760000,"ppsf":736,"sale_to_list":98.1,"dom":23},{"mls":"73071584","unit":"508","closed":"2023-04-12","year":2023,"beds":"1 BR","bedrooms":1,"baths":1,"sqft":845,"floor":5,"parking":"No parking","spaces":0,"list_price":649000,"sale_price":638500,"ppsf":756,"sale_to_list":98.4,"dom":64},{"mls":"73081774","unit":"210","closed":"2023-03-15","year":2023,"beds":"1 BR","bedrooms":1,"baths":2,"sqft":1175,"floor":2,"parking":"With parking","spaces":1,"list_price":868000,"sale_price":858000,"ppsf":730,"sale_to_list":98.8,"dom":12},{"mls":"73047488","unit":"314","closed":"2023-03-15","year":2023,"beds":"1 BR","bedrooms":1,"baths":2,"sqft":818,"floor":3,"parking":"With parking","spaces":1,"list_price":689000,"sale_price":682000,"ppsf":834,"sale_to_list":99.0,"dom":114},{"mls":"73050496","unit":"506","closed":"2023-03-10","year":2023,"beds":"2 BR","bedrooms":2,"baths":2,"sqft":1137,"floor":5,"parking":"With parking","spaces":1,"list_price":859000,"sale_price":848000,"ppsf":746,"sale_to_list":98.7,"dom":62},{"mls":"73020500","unit":"500","closed":"2022-11-01","year":2022,"beds":"1 BR","bedrooms":1,"baths":2,"sqft":1003,"floor":5,"parking":"With parking","spaces":1,"list_price":799000,"sale_price":780000,"ppsf":778,"sale_to_list":97.6,"dom":63},{"mls":"73002674","unit":"202","closed":"2022-09-09","year":2022,"beds":"2 BR","bedrooms":2,"baths":2,"sqft":1149,"floor":2,"parking":"With parking","spaces":1,"list_price":869000,"sale_price":845000,"ppsf":735,"sale_to_list":97.2,"dom":39},{"mls":"72988993","unit":"309","closed":"2022-09-01","year":2022,"beds":"1 BR","bedrooms":1,"baths":1,"sqft":862,"floor":3,"parking":"With parking","spaces":2,"list_price":699000,"sale_price":715000,"ppsf":829,"sale_to_list":102.3,"dom":35},{"mls":"72971500","unit":"410","closed":"2022-08-12","year":2022,"beds":"2 BR","bedrooms":2,"baths":2,"sqft":1195,"floor":4,"parking":"With parking","spaces":1,"list_price":899000,"sale_price":850000,"ppsf":711,"sale_to_list":94.6,"dom":80},{"mls":"72991524","unit":"419","closed":"2022-08-10","year":2022,"beds":"1 BR","bedrooms":1,"baths":1,"sqft":677,"floor":4,"parking":"No parking","spaces":0,"list_price":589000,"sale_price":585000,"ppsf":864,"sale_to_list":99.3,"dom":43},{"mls":"72979908","unit":"301","closed":"2022-07-08","year":2022,"beds":"2 BR","bedrooms":2,"baths":2,"sqft":1149,"floor":3,"parking":"With parking","spaces":4,"list_price":1149000,"sale_price":1100000,"ppsf":957,"sale_to_list":95.7,"dom":28},{"mls":"72943341","unit":"604","closed":"2022-04-29","year":2022,"beds":"2 BR","bedrooms":2,"baths":3,"sqft":1746,"floor":6,"parking":"With parking","spaces":2,"list_price":1599999,"sale_price":1535000,"ppsf":879,"sale_to_list":95.9,"dom":21},{"mls":"72940786","unit":"211","closed":"2022-03-17","year":2022,"beds":"2 BR","bedrooms":2,"baths":2,"sqft":1280,"floor":2,"parking":"With parking","spaces":1,"list_price":989000,"sale_price":1000000,"ppsf":781,"sale_to_list":101.1,"dom":13},{"mls":"72904498","unit":"613","closed":"2022-03-01","year":2022,"beds":"2 BR","bedrooms":2,"baths":3,"sqft":1713,"floor":6,"parking":"With parking","spaces":1,"list_price":1529000,"sale_price":1520000,"ppsf":887,"sale_to_list":99.4,"dom":93},{"mls":"72896074","unit":"412","closed":"2022-02-07","year":2022,"beds":"2 BR","bedrooms":2,"baths":2,"sqft":1442,"floor":4,"parking":"With parking","spaces":2,"list_price":1195000,"sale_price":1175000,"ppsf":815,"sale_to_list":98.3,"dom":64},{"mls":"72908309","unit":"400","closed":"2022-01-18","year":2022,"beds":"1 BR","bedrooms":1,"baths":2,"sqft":1011,"floor":4,"parking":"With parking","spaces":1,"list_price":799000,"sale_price":785000,"ppsf":776,"sale_to_list":98.2,"dom":22},{"mls":"72913690","unit":"219","closed":"2022-01-14","year":2022,"beds":"1 BR","bedrooms":1,"baths":1,"sqft":678,"floor":2,"parking":"With parking","spaces":1,"list_price":625000,"sale_price":615000,"ppsf":907,"sale_to_list":98.4,"dom":27},{"mls":"72881946","unit":"406","closed":"2021-11-22","year":2021,"beds":"2 BR","bedrooms":2,"baths":2,"sqft":1136,"floor":4,"parking":"With parking","spaces":1,"list_price":879000,"sale_price":875000,"ppsf":770,"sale_to_list":99.5,"dom":66},{"mls":"72841926","unit":"509","closed":"2021-09-01","year":2021,"beds":"1 BR","bedrooms":1,"baths":1,"sqft":861,"floor":5,"parking":"No parking","spaces":0,"list_price":625000,"sale_price":625000,"ppsf":726,"sale_to_list":100.0,"dom":21},{"mls":"72849893","unit":"106","closed":"2021-08-19","year":2021,"beds":"2 BR","bedrooms":2,"baths":2,"sqft":1139,"floor":1,"parking":"With parking","spaces":2,"list_price":889000,"sale_price":875000,"ppsf":768,"sale_to_list":98.4,"dom":29},{"mls":"72813967","unit":"601","closed":"2021-08-12","year":2021,"beds":"3 BR","bedrooms":3,"baths":2,"sqft":2114,"floor":6,"parking":"With parking","spaces":2,"list_price":2100000,"sale_price":2080000,"ppsf":984,"sale_to_list":99.0,"dom":43},{"mls":"72803461","unit":"201","closed":"2021-08-12","year":2021,"beds":"2 BR","bedrooms":2,"baths":2,"sqft":1140,"floor":2,"parking":"With parking","spaces":2,"list_price":949000,"sale_price":990000,"ppsf":868,"sale_to_list":104.3,"dom":83},{"mls":"72830433","unit":"604","closed":"2021-07-16","year":2021,"beds":"2 BR","bedrooms":2,"baths":3,"sqft":1746,"floor":6,"parking":"With parking","spaces":2,"list_price":1700000,"sale_price":1650000,"ppsf":945,"sale_to_list":97.1,"dom":26},{"mls":"72834062","unit":"511","closed":"2021-06-30","year":2021,"beds":"2 BR","bedrooms":2,"baths":2,"sqft":1282,"floor":5,"parking":"With parking","spaces":2,"list_price":959000,"sale_price":952000,"ppsf":743,"sale_to_list":99.3,"dom":5},{"mls":"72808853","unit":"417","closed":"2021-06-15","year":2021,"beds":"1 BR","bedrooms":1,"baths":1,"sqft":770,"floor":4,"parking":"With parking","spaces":1,"list_price":639000,"sale_price":612000,"ppsf":795,"sale_to_list":95.8,"dom":32},{"mls":"72799521","unit":"215","closed":"2021-05-21","year":2021,"beds":"1 BR","bedrooms":1,"baths":1,"sqft":686,"floor":2,"parking":"With parking","spaces":1,"list_price":599000,"sale_price":597500,"ppsf":871,"sale_to_list":99.8,"dom":49},{"mls":"72669848","unit":"305","closed":"2021-04-30","year":2021,"beds":"2 BR","bedrooms":2,"baths":2,"sqft":1282,"floor":3,"parking":"With parking","spaces":1,"list_price":1099000,"sale_price":1000000,"ppsf":780,"sale_to_list":91.0,"dom":272},{"mls":"72751730","unit":"119","closed":"2021-03-05","year":2021,"beds":"1 BR","bedrooms":1,"baths":1,"sqft":690,"floor":1,"parking":"With parking","spaces":1,"list_price":595000,"sale_price":572850,"ppsf":830,"sale_to_list":96.3,"dom":89},{"mls":"72737983","unit":"524","closed":"2021-01-29","year":2021,"beds":"2 BR","bedrooms":2,"baths":2,"sqft":1248,"floor":5,"parking":"With parking","spaces":1,"list_price":949900,"sale_price":950000,"ppsf":761,"sale_to_list":100.0,"dom":8},{"mls":"72734019","unit":"407","closed":"2021-01-08","year":2021,"beds":"1 BR","bedrooms":1,"baths":2,"sqft":1486,"floor":4,"parking":"With parking","spaces":1,"list_price":1299000,"sale_price":1150000,"ppsf":774,"sale_to_list":88.5,"dom":58},{"mls":"72727436","unit":"213","closed":"2020-11-25","year":2020,"beds":"1 BR","bedrooms":1,"baths":1,"sqft":759,"floor":2,"parking":"With parking","spaces":1,"list_price":639000,"sale_price":637000,"ppsf":839,"sale_to_list":99.7,"dom":47},{"mls":"72723897","unit":"418","closed":"2020-10-22","year":2020,"beds":"1 BR","bedrooms":1,"baths":2,"sqft":837,"floor":4,"parking":"No parking","spaces":0,"list_price":675000,"sale_price":655000,"ppsf":783,"sale_to_list":97.0,"dom":25},{"mls":"72679793","unit":"310","closed":"2020-10-07","year":2020,"beds":"2 BR","bedrooms":2,"baths":2,"sqft":1167,"floor":3,"parking":"With parking","spaces":2,"list_price":899900,"sale_price":850000,"ppsf":728,"sale_to_list":94.4,"dom":57},{"mls":"72675628","unit":"320","closed":"2020-09-18","year":2020,"beds":"2 BR","bedrooms":2,"baths":3,"sqft":1539,"floor":3,"parking":"With parking","spaces":2,"list_price":1229000,"sale_price":1100000,"ppsf":715,"sale_to_list":89.5,"dom":37},{"mls":"72653225","unit":"208","closed":"2020-08-13","year":2020,"beds":"1 BR","bedrooms":1,"baths":1,"sqft":850,"floor":2,"parking":"No parking","spaces":0,"list_price":615000,"sale_price":600000,"ppsf":706,"sale_to_list":97.6,"dom":66},{"mls":"72661970","unit":"216","closed":"2020-06-24","year":2020,"beds":"2 BR","bedrooms":2,"baths":2,"sqft":909,"floor":2,"parking":"With parking","spaces":1,"list_price":825000,"sale_price":815000,"ppsf":897,"sale_to_list":98.8,"dom":14},{"mls":"72562218","unit":"206","closed":"2020-01-31","year":2020,"beds":"1 BR","bedrooms":1,"baths":2,"sqft":1129,"floor":2,"parking":"With parking","spaces":2,"list_price":845000,"sale_price":775000,"ppsf":686,"sale_to_list":91.7,"dom":102},{"mls":"72570019","unit":"107","closed":"2020-01-22","year":2020,"beds":"2 BR","bedrooms":2,"baths":2,"sqft":1498,"floor":1,"parking":"With parking","spaces":2,"list_price":999900,"sale_price":923800,"ppsf":617,"sale_to_list":92.4,"dom":85},{"mls":"72499796","unit":"209","closed":"2019-10-10","year":2019,"beds":"1 BR","bedrooms":1,"baths":1,"sqft":862,"floor":2,"parking":"With parking","spaces":1,"list_price":715000,"sale_price":702000,"ppsf":814,"sale_to_list":98.2,"dom":121},{"mls":"72516929","unit":"609","closed":"2019-09-30","year":2019,"beds":"2 BR","bedrooms":2,"baths":2,"sqft":1308,"floor":6,"parking":"With parking","spaces":1,"list_price":1159000,"sale_price":1100000,"ppsf":841,"sale_to_list":94.9,"dom":77},{"mls":"72500246","unit":"406","closed":"2019-09-27","year":2019,"beds":"2 BR","bedrooms":2,"baths":2,"sqft":1136,"floor":4,"parking":"With parking","spaces":2,"list_price":899000,"sale_price":855000,"ppsf":753,"sale_to_list":95.1,"dom":120},{"mls":"72486511","unit":"603","closed":"2019-09-23","year":2019,"beds":"2 BR","bedrooms":2,"baths":2,"sqft":1361,"floor":6,"parking":"With parking","spaces":2,"list_price":1250000,"sale_price":1265000,"ppsf":929,"sale_to_list":101.2,"dom":119},{"mls":"72507705","unit":"415","closed":"2019-09-03","year":2019,"beds":"1 BR","bedrooms":1,"baths":1,"sqft":679,"floor":4,"parking":"With parking","spaces":2,"list_price":625000,"sale_price":600000,"ppsf":884,"sale_to_list":96.0,"dom":62},{"mls":"72499778","unit":"417","closed":"2019-07-09","year":2019,"beds":"1 BR","bedrooms":1,"baths":1,"sqft":770,"floor":4,"parking":"No parking","spaces":0,"list_price":585000,"sale_price":590000,"ppsf":766,"sale_to_list":100.8,"dom":24},{"mls":"72480218","unit":"111","closed":"2019-06-26","year":2019,"beds":"2 BR","bedrooms":2,"baths":2,"sqft":1285,"floor":1,"parking":"With parking","spaces":2,"list_price":895000,"sale_price":890000,"ppsf":693,"sale_to_list":99.4,"dom":24},{"mls":"72467454","unit":"321","closed":"2019-05-10","year":2019,"beds":"1 BR","bedrooms":1,"baths":1,"sqft":852,"floor":3,"parking":"With parking","spaces":1,"list_price":740000,"sale_price":750000,"ppsf":880,"sale_to_list":101.4,"dom":27},{"mls":"72463295","unit":"319","closed":"2019-05-09","year":2019,"beds":"1 BR","bedrooms":1,"baths":1,"sqft":681,"floor":3,"parking":"With parking","spaces":2,"list_price":599000,"sale_price":610000,"ppsf":896,"sale_to_list":101.8,"dom":20},{"mls":"72438284","unit":"613","closed":"2019-04-16","year":2019,"beds":"2 BR","bedrooms":2,"baths":3,"sqft":1713,"floor":6,"parking":"With parking","spaces":1,"list_price":1539000,"sale_price":1507500,"ppsf":880,"sale_to_list":98.0,"dom":71},{"mls":"72445682","unit":"214","closed":"2019-03-26","year":2019,"beds":"1 BR","bedrooms":1,"baths":2,"sqft":818,"floor":2,"parking":"With parking","spaces":2,"list_price":649000,"sale_price":649000,"ppsf":793,"sale_to_list":100.0,"dom":33},{"mls":"72449783","unit":"203","closed":"2019-03-20","year":2019,"beds":"2 BR","bedrooms":2,"baths":2,"sqft":1289,"floor":2,"parking":"With parking","spaces":1,"list_price":1149900,"sale_price":1125000,"ppsf":873,"sale_to_list":97.8,"dom":20},{"mls":"72363245","unit":"106","closed":"2018-09-28","year":2018,"beds":"2 BR","bedrooms":2,"baths":2,"sqft":1139,"floor":1,"parking":"With parking","spaces":1,"list_price":950000,"sale_price":890000,"ppsf":781,"sale_to_list":93.7,"dom":57},{"mls":"72391586","unit":"311","closed":"2018-09-18","year":2018,"beds":"2 BR","bedrooms":2,"baths":2,"sqft":1283,"floor":3,"parking":"With parking","spaces":1,"list_price":1030000,"sale_price":980000,"ppsf":764,"sale_to_list":95.2,"dom":23},{"mls":"72328021","unit":"405","closed":"2018-07-02","year":2018,"beds":"2 BR","bedrooms":2,"baths":2,"sqft":1285,"floor":4,"parking":"With parking","spaces":1,"list_price":1150000,"sale_price":1150000,"ppsf":895,"sale_to_list":100.0,"dom":14},{"mls":"72302516","unit":"411","closed":"2018-05-18","year":2018,"beds":"2 BR","bedrooms":2,"baths":2,"sqft":1280,"floor":4,"parking":"With parking","spaces":1,"list_price":925000,"sale_price":950000,"ppsf":742,"sale_to_list":102.7,"dom":20},{"mls":"72301527","unit":"207","closed":"2018-05-08","year":2018,"beds":"2 BR","bedrooms":2,"baths":2,"sqft":1496,"floor":2,"parking":"With parking","spaces":1,"list_price":1199900,"sale_price":1220000,"ppsf":816,"sale_to_list":101.7,"dom":17},{"mls":"72215610","unit":"520","closed":"2017-11-30","year":2017,"beds":"2 BR","bedrooms":2,"baths":3,"sqft":1540,"floor":5,"parking":"With parking","spaces":2,"list_price":1099000,"sale_price":1095000,"ppsf":711,"sale_to_list":99.6,"dom":74},{"mls":"72244490","unit":"408","closed":"2017-11-30","year":2017,"beds":"1 BR","bedrooms":1,"baths":1,"sqft":847,"floor":4,"parking":"With parking","spaces":2,"list_price":599995,"sale_price":600000,"ppsf":708,"sale_to_list":100.0,"dom":22},{"mls":"72147885","unit":"322","closed":"2017-06-15","year":2017,"beds":"2 BR","bedrooms":2,"baths":2,"sqft":1296,"floor":3,"parking":"With parking","spaces":2,"list_price":934900,"sale_price":960000,"ppsf":741,"sale_to_list":102.7,"dom":19},{"mls":"72143879","unit":"500","closed":"2017-06-05","year":2017,"beds":"1 BR","bedrooms":1,"baths":2,"sqft":1003,"floor":5,"parking":"With parking","spaces":2,"list_price":799000,"sale_price":800000,"ppsf":798,"sale_to_list":100.1,"dom":16},{"mls":"72133764","unit":"214","closed":"2017-05-25","year":2017,"beds":"1 BR","bedrooms":1,"baths":2,"sqft":818,"floor":2,"parking":"With parking","spaces":2,"list_price":629900,"sale_price":670000,"ppsf":819,"sale_to_list":106.4,"dom":18},{"mls":"72100408","unit":"525","closed":"2017-02-16","year":2017,"beds":"2 BR","bedrooms":2,"baths":2,"sqft":1060,"floor":5,"parking":"With parking","spaces":1,"list_price":799900,"sale_price":815000,"ppsf":769,"sale_to_list":101.9,"dom":15},{"mls":"72088899","unit":"208","closed":"2017-02-02","year":2017,"beds":"1 BR","bedrooms":1,"baths":1,"sqft":896,"floor":2,"parking":"With parking","spaces":2,"list_price":600000,"sale_price":594000,"ppsf":663,"sale_to_list":99.0,"dom":29},{"mls":"72063497","unit":"609","closed":"2016-12-05","year":2016,"beds":"2 BR","bedrooms":2,"baths":2,"sqft":1308,"floor":6,"parking":"With parking","spaces":2,"list_price":969000,"sale_price":960000,"ppsf":734,"sale_to_list":99.1,"dom":48},{"mls":"72081585","unit":"504","closed":"2016-11-29","year":2016,"beds":"2 BR","bedrooms":2,"baths":2,"sqft":1210,"floor":5,"parking":"With parking","spaces":2,"list_price":850000,"sale_price":899000,"ppsf":743,"sale_to_list":105.8,"dom":5},{"mls":"72047274","unit":"313","closed":"2016-10-21","year":2016,"beds":"1 BR","bedrooms":1,"baths":1,"sqft":763,"floor":3,"parking":"With parking","spaces":2,"list_price":599000,"sale_price":635000,"ppsf":832,"sale_to_list":106.0,"dom":11},{"mls":"72063638","unit":"513","closed":"2016-10-07","year":2016,"beds":"1 BR","bedrooms":1,"baths":1,"sqft":758,"floor":5,"parking":"With parking","spaces":2,"list_price":615000,"sale_price":640000,"ppsf":844,"sale_to_list":104.1,"dom":17},{"mls":"72027748","unit":"325","closed":"2016-08-05","year":2016,"beds":"2 BR","bedrooms":2,"baths":2,"sqft":1081,"floor":3,"parking":"With parking","spaces":2,"list_price":749000,"sale_price":805000,"ppsf":745,"sale_to_list":107.5,"dom":17},{"mls":"71960404","unit":"101","closed":"2016-03-31","year":2016,"beds":"2 BR","bedrooms":2,"baths":2,"sqft":1119,"floor":1,"parking":"With parking","spaces":1,"list_price":699000,"sale_price":712000,"ppsf":636,"sale_to_list":101.9,"dom":10},{"mls":"71903831","unit":"512","closed":"2015-11-12","year":2015,"beds":"2 BR","bedrooms":2,"baths":2,"sqft":1454,"floor":5,"parking":"With parking","spaces":2,"list_price":999000,"sale_price":1005000,"ppsf":691,"sale_to_list":100.6,"dom":18},{"mls":"71858212","unit":"322","closed":"2015-09-04","year":2015,"beds":"2 BR","bedrooms":2,"baths":2,"sqft":1296,"floor":3,"parking":"With parking","spaces":1,"list_price":830000,"sale_price":817500,"ppsf":631,"sale_to_list":98.5,"dom":16},{"mls":"71850964","unit":"209","closed":"2015-07-24","year":2015,"beds":"1 BR","bedrooms":1,"baths":1,"sqft":862,"floor":2,"parking":"With parking","spaces":2,"list_price":575000,"sale_price":580000,"ppsf":673,"sale_to_list":100.9,"dom":5},{"mls":"71845020","unit":"213","closed":"2015-07-23","year":2015,"beds":"1 BR","bedrooms":1,"baths":1,"sqft":759,"floor":2,"parking":"With parking","spaces":2,"list_price":499000,"sale_price":563000,"ppsf":742,"sale_to_list":112.8,"dom":61},{"mls":"71822334","unit":"606","closed":"2015-07-06","year":2015,"beds":"2 BR","bedrooms":2,"baths":2,"sqft":2192,"floor":6,"parking":"With parking","spaces":4,"list_price":1599000,"sale_price":1650000,"ppsf":753,"sale_to_list":103.2,"dom":21},{"mls":"71803295","unit":"216","closed":"2015-06-01","year":2015,"beds":"2 BR","bedrooms":2,"baths":2,"sqft":920,"floor":2,"parking":"With parking","spaces":1,"list_price":615000,"sale_price":645000,"ppsf":701,"sale_to_list":104.9,"dom":22},{"mls":"71817753","unit":"102","closed":"2015-05-20","year":2015,"beds":"1 BR","bedrooms":1,"baths":2,"sqft":1158,"floor":1,"parking":"With parking","spaces":2,"list_price":669000,"sale_price":715000,"ppsf":617,"sale_to_list":106.9,"dom":5},{"mls":"71789884","unit":"107","closed":"2015-02-28","year":2015,"beds":"2 BR","bedrooms":2,"baths":2,"sqft":1498,"floor":1,"parking":"With parking","spaces":1,"list_price":840000,"sale_price":840000,"ppsf":561,"sale_to_list":100.0,"dom":27},{"mls":"71786502","unit":"217","closed":"2015-02-27","year":2015,"beds":"1 BR","bedrooms":1,"baths":1,"sqft":724,"floor":2,"parking":"No parking","spaces":0,"list_price":499000,"sale_price":490000,"ppsf":677,"sale_to_list":98.2,"dom":22},{"mls":"71756556","unit":"417","closed":"2014-11-21","year":2014,"beds":"1 BR","bedrooms":1,"baths":1,"sqft":770,"floor":4,"parking":"No parking","spaces":0,"list_price":499900,"sale_price":510000,"ppsf":662,"sale_to_list":102.0,"dom":20},{"mls":"71710368","unit":"525","closed":"2014-08-07","year":2014,"beds":"2 BR","bedrooms":2,"baths":2,"sqft":1139,"floor":5,"parking":"With parking","spaces":2,"list_price":649000,"sale_price":665000,"ppsf":584,"sale_to_list":102.5,"dom":57},{"mls":"71688444","unit":"106","closed":"2014-07-22","year":2014,"beds":"2 BR","bedrooms":2,"baths":2,"sqft":1139,"floor":1,"parking":"With parking","spaces":2,"list_price":629000,"sale_price":640000,"ppsf":562,"sale_to_list":101.8,"dom":41},{"mls":"71654390","unit":"514","closed":"2014-05-21","year":2014,"beds":"1 BR","bedrooms":1,"baths":2,"sqft":815,"floor":5,"parking":"With parking","spaces":2,"list_price":529000,"sale_price":555000,"ppsf":681,"sale_to_list":104.9,"dom":17},{"mls":"71610527","unit":"401","closed":"2014-01-15","year":2014,"beds":"2 BR","bedrooms":2,"baths":2,"sqft":1130,"floor":4,"parking":"With parking","spaces":2,"list_price":615000,"sale_price":615000,"ppsf":544,"sale_to_list":100.0,"dom":23},{"mls":"71558233","unit":"613","closed":"2013-10-16","year":2013,"beds":"2 BR","bedrooms":2,"baths":3,"sqft":1713,"floor":6,"parking":"With parking","spaces":2,"list_price":999000,"sale_price":999000,"ppsf":583,"sale_to_list":100.0,"dom":61},{"mls":"71399839","unit":"320","closed":"2013-07-29","year":2013,"beds":"2 BR","bedrooms":2,"baths":3,"sqft":1539,"floor":3,"parking":"With parking","spaces":2,"list_price":785000,"sale_price":785000,"ppsf":510,"sale_to_list":100.0,"dom":385},{"mls":"71525204","unit":"209","closed":"2013-06-21","year":2013,"beds":"1 BR","bedrooms":1,"baths":1,"sqft":862,"floor":2,"parking":"With parking","spaces":2,"list_price":459000,"sale_price":486200,"ppsf":564,"sale_to_list":105.9,"dom":2},{"mls":"71487276","unit":"517","closed":"2013-05-13","year":2013,"beds":"1 BR","bedrooms":1,"baths":1,"sqft":782,"floor":5,"parking":"With parking","spaces":2,"list_price":449000,"sale_price":449000,"ppsf":574,"sale_to_list":100.0,"dom":33},{"mls":"71474743","unit":"310","closed":"2013-03-01","year":2013,"beds":"1 BR","bedrooms":1,"baths":2,"sqft":1167,"floor":3,"parking":"No parking","spaces":0,"list_price":559000,"sale_price":550000,"ppsf":471,"sale_to_list":98.4,"dom":13},{"mls":"71464814","unit":"306","closed":"2013-03-01","year":2013,"beds":"2 BR","bedrooms":2,"baths":2,"sqft":1129,"floor":3,"parking":"With parking","spaces":2,"list_price":599000,"sale_price":587500,"ppsf":520,"sale_to_list":98.1,"dom":17},{"mls":"71437069","unit":"325","closed":"2012-12-28","year":2012,"beds":"2 BR","bedrooms":2,"baths":2,"sqft":1081,"floor":3,"parking":"With parking","spaces":2,"list_price":565000,"sale_price":565000,"ppsf":523,"sale_to_list":100.0,"dom":11},{"mls":"71425791","unit":"611","closed":"2012-11-13","year":2012,"beds":"2 BR","bedrooms":2,"baths":3,"sqft":1872,"floor":6,"parking":"With parking","spaces":2,"list_price":799000,"sale_price":791000,"ppsf":423,"sale_to_list":99.0,"dom":70},{"mls":"71373282","unit":"202","closed":"2012-08-30","year":2012,"beds":"2 BR","bedrooms":2,"baths":2,"sqft":1149,"floor":2,"parking":"With parking","spaces":2,"list_price":565000,"sale_price":545000,"ppsf":474,"sale_to_list":96.5,"dom":47},{"mls":"71380778","unit":"513","closed":"2012-08-15","year":2012,"beds":"1 BR","bedrooms":1,"baths":1,"sqft":758,"floor":5,"parking":"With parking","spaces":2,"list_price":469000,"sale_price":440000,"ppsf":580,"sale_to_list":93.8,"dom":43},{"mls":"71376775","unit":"612","closed":"2012-07-31","year":2012,"beds":"3 BR","bedrooms":3,"baths":3,"sqft":2264,"floor":6,"parking":"With parking","spaces":2,"list_price":1329000,"sale_price":1275000,"ppsf":563,"sale_to_list":95.9,"dom":33},{"mls":"71383971","unit":"102","closed":"2012-07-12","year":2012,"beds":"1 BR","bedrooms":1,"baths":2,"sqft":1158,"floor":1,"parking":"With parking","spaces":2,"list_price":499000,"sale_price":503000,"ppsf":434,"sale_to_list":100.8,"dom":21},{"mls":"71365394","unit":"418","closed":"2012-07-10","year":2012,"beds":"1 BR","bedrooms":1,"baths":2,"sqft":837,"floor":4,"parking":"With parking","spaces":2,"list_price":439900,"sale_price":420000,"ppsf":502,"sale_to_list":95.5,"dom":54},{"mls":"71366554","unit":"115","closed":"2012-06-21","year":2012,"beds":"1 BR","bedrooms":1,"baths":1,"sqft":673,"floor":1,"parking":"With parking","spaces":2,"list_price":365000,"sale_price":360000,"ppsf":535,"sale_to_list":98.6,"dom":18},{"mls":"71223959","unit":"512","closed":"2012-06-15","year":2012,"beds":"1 BR","bedrooms":1,"baths":2,"sqft":1454,"floor":5,"parking":"With parking","spaces":2,"list_price":719000,"sale_price":699000,"ppsf":481,"sale_to_list":97.2,"dom":346},{"mls":"71325719","unit":"301","closed":"2012-03-02","year":2012,"beds":"2 BR","bedrooms":2,"baths":2,"sqft":1149,"floor":3,"parking":"With parking","spaces":2,"list_price":599000,"sale_price":577500,"ppsf":503,"sale_to_list":96.4,"dom":35},{"mls":"71306626","unit":"413","closed":"2012-03-02","year":2012,"beds":"1 BR","bedrooms":1,"baths":1,"sqft":763,"floor":4,"parking":"No parking","spaces":0,"list_price":385000,"sale_price":372500,"ppsf":488,"sale_to_list":96.8,"dom":105},{"mls":"71290847","unit":"203","closed":"2012-02-06","year":2012,"beds":"2 BR","bedrooms":2,"baths":2,"sqft":1289,"floor":2,"parking":"With parking","spaces":2,"list_price":599000,"sale_price":558750,"ppsf":433,"sale_to_list":93.3,"dom":85},{"mls":"71285060","unit":"601","closed":"2012-01-03","year":2012,"beds":"3 BR","bedrooms":3,"baths":2,"sqft":2114,"floor":6,"parking":"With parking","spaces":2,"list_price":1379000,"sale_price":1277500,"ppsf":604,"sale_to_list":92.6,"dom":88},{"mls":"71281932","unit":"405","closed":"2011-12-05","year":2011,"beds":"2 BR","bedrooms":2,"baths":2,"sqft":1285,"floor":4,"parking":"With parking","spaces":2,"list_price":599900,"sale_price":586000,"ppsf":456,"sale_to_list":97.7,"dom":62},{"mls":"71278618","unit":"323","closed":"2011-10-28","year":2011,"beds":"1 BR","bedrooms":1,"baths":1,"sqft":831,"floor":3,"parking":"With parking","spaces":2,"list_price":419000,"sale_price":410000,"ppsf":493,"sale_to_list":97.8,"dom":26},{"mls":"71291288","unit":"101","closed":"2011-10-19","year":2011,"beds":"2 BR","bedrooms":2,"baths":2,"sqft":1119,"floor":1,"parking":"With parking","spaces":2,"list_price":519000,"sale_price":503000,"ppsf":450,"sale_to_list":96.9,"dom":19},{"mls":"71241942","unit":"609","closed":"2011-09-19","year":2011,"beds":"2 BR","bedrooms":2,"baths":2,"sqft":1308,"floor":6,"parking":"With parking","spaces":2,"list_price":649000,"sale_price":617500,"ppsf":472,"sale_to_list":95.2,"dom":100},{"mls":"71259404","unit":"421","closed":"2011-08-31","year":2011,"beds":"1 BR","bedrooms":1,"baths":1,"sqft":830,"floor":4,"parking":"With parking","spaces":2,"list_price":489000,"sale_price":450000,"ppsf":542,"sale_to_list":92.0,"dom":36},{"mls":"71182392","unit":"207","closed":"2011-08-12","year":2011,"beds":"1 BR","bedrooms":1,"baths":2,"sqft":1496,"floor":2,"parking":"With parking","spaces":2,"list_price":710000,"sale_price":690000,"ppsf":461,"sale_to_list":97.2,"dom":168},{"mls":"71211134","unit":"309","closed":"2011-07-18","year":2011,"beds":"1 BR","bedrooms":1,"baths":1,"sqft":862,"floor":3,"parking":"With parking","spaces":2,"list_price":439000,"sale_price":421000,"ppsf":488,"sale_to_list":95.9,"dom":74},{"mls":"71235996","unit":"605","closed":"2011-07-15","year":2011,"beds":"2 BR","bedrooms":2,"baths":3,"sqft":2967,"floor":6,"parking":"With parking","spaces":4,"list_price":1899000,"sale_price":1700000,"ppsf":573,"sale_to_list":89.5,"dom":42},{"mls":"71204660","unit":"416","closed":"2011-06-13","year":2011,"beds":"1 BR","bedrooms":1,"baths":2,"sqft":936,"floor":4,"parking":"With parking","spaces":2,"list_price":469900,"sale_price":428000,"ppsf":457,"sale_to_list":91.1,"dom":69},{"mls":"71179599","unit":"307","closed":"2011-06-01","year":2011,"beds":"2 BR","bedrooms":2,"baths":2,"sqft":1410,"floor":3,"parking":"With parking","spaces":2,"list_price":719900,"sale_price":665000,"ppsf":472,"sale_to_list":92.4,"dom":77},{"mls":"71188028","unit":"608","closed":"2011-06-01","year":2011,"beds":"2 BR","bedrooms":2,"baths":2,"sqft":1371,"floor":6,"parking":"No parking","spaces":0,"list_price":699000,"sale_price":675000,"ppsf":492,"sale_to_list":96.6,"dom":1},{"mls":"71183875","unit":"612","closed":"2011-04-01","year":2011,"beds":"2 BR","bedrooms":2,"baths":3,"sqft":2224,"floor":6,"parking":"With parking","spaces":2,"list_price":1199000,"sale_price":1112500,"ppsf":500,"sale_to_list":92.8,"dom":0},{"mls":"71107958","unit":"219","closed":"2011-03-18","year":2011,"beds":"1 BR","bedrooms":1,"baths":1,"sqft":690,"floor":2,"parking":"No parking","spaces":0,"list_price":329900,"sale_price":305000,"ppsf":442,"sale_to_list":92.4,"dom":120},{"mls":"71055642","unit":"522","closed":"2011-03-01","year":2011,"beds":"2 BR","bedrooms":2,"baths":2,"sqft":1322,"floor":5,"parking":"With parking","spaces":2,"list_price":569900,"sale_price":560000,"ppsf":424,"sale_to_list":98.3,"dom":285},{"mls":"71132896","unit":"411","closed":"2010-12-21","year":2010,"beds":"2 BR","bedrooms":2,"baths":2,"sqft":1290,"floor":4,"parking":"With parking","spaces":2,"list_price":619900,"sale_price":605000,"ppsf":469,"sale_to_list":97.6,"dom":85},{"mls":"71099313","unit":"408","closed":"2010-11-29","year":2010,"beds":"1 BR","bedrooms":1,"baths":1,"sqft":847,"floor":4,"parking":"With parking","spaces":2,"list_price":419000,"sale_price":398500,"ppsf":470,"sale_to_list":95.1,"dom":140},{"mls":"71026459","unit":"519","closed":"2010-09-07","year":2010,"beds":"1 BR","bedrooms":1,"baths":1,"sqft":690,"floor":5,"parking":"No parking","spaces":0,"list_price":379000,"sale_price":337500,"ppsf":489,"sale_to_list":89.0,"dom":90},{"mls":"71079699","unit":"208","closed":"2010-07-27","year":2010,"beds":"Studio","bedrooms":0,"baths":1,"sqft":896,"floor":2,"parking":"No parking","spaces":0,"list_price":379000,"sale_price":369000,"ppsf":412,"sale_to_list":97.4,"dom":27},{"mls":"71068869","unit":"206","closed":"2010-06-30","year":2010,"beds":"1 BR","bedrooms":1,"baths":2,"sqft":1129,"floor":2,"parking":"With parking","spaces":2,"list_price":569000,"sale_price":545000,"ppsf":483,"sale_to_list":95.8,"dom":12},{"mls":"71051326","unit":"413","closed":"2010-06-28","year":2010,"beds":"1 BR","bedrooms":1,"baths":1,"sqft":763,"floor":4,"parking":"With parking","spaces":2,"list_price":399000,"sale_price":395000,"ppsf":518,"sale_to_list":99.0,"dom":84},{"mls":"71063702","unit":"218","closed":"2010-06-17","year":2010,"beds":"1 BR","bedrooms":1,"baths":2,"sqft":826,"floor":2,"parking":"With parking","spaces":1,"list_price":409000,"sale_price":395000,"ppsf":478,"sale_to_list":96.6,"dom":20},{"mls":"71024122","unit":"215","closed":"2010-04-22","year":2010,"beds":"1 BR","bedrooms":1,"baths":1,"sqft":686,"floor":2,"parking":"With parking","spaces":2,"list_price":415000,"sale_price":394500,"ppsf":575,"sale_to_list":95.1,"dom":91},{"mls":"71028576","unit":"417","closed":"2010-04-15","year":2010,"beds":"1 BR","bedrooms":1,"baths":1,"sqft":770,"floor":4,"parking":"No parking","spaces":0,"list_price":399000,"sale_price":382500,"ppsf":497,"sale_to_list":95.9,"dom":28},{"mls":"70978018","unit":"504","closed":"2010-01-14","year":2010,"beds":"2 BR","bedrooms":2,"baths":2,"sqft":1210,"floor":5,"parking":"With parking","spaces":2,"list_price":624900,"sale_price":600000,"ppsf":496,"sale_to_list":96.0,"dom":76},{"mls":"70919904","unit":"610","closed":"2009-09-03","year":2009,"beds":"2 BR","bedrooms":2,"baths":2,"sqft":1159,"floor":6,"parking":"With parking","spaces":2,"list_price":629000,"sale_price":605000,"ppsf":522,"sale_to_list":96.2,"dom":88},{"mls":"70862678","unit":"415","closed":"2009-08-31","year":2009,"beds":"1 BR","bedrooms":1,"baths":1,"sqft":679,"floor":4,"parking":"With parking","spaces":2,"list_price":399999,"sale_price":394500,"ppsf":581,"sale_to_list":98.6,"dom":191},{"mls":"70928580","unit":"212","closed":"2009-06-29","year":2009,"beds":"2 BR","bedrooms":2,"baths":2,"sqft":1442,"floor":2,"parking":"With parking","spaces":2,"list_price":649900,"sale_price":635000,"ppsf":440,"sale_to_list":97.7,"dom":5},{"mls":"70824248","unit":"412","closed":"2009-04-10","year":2009,"beds":"2 BR","bedrooms":2,"baths":2,"sqft":1442,"floor":4,"parking":"With parking","spaces":1,"list_price":745875,"sale_price":650000,"ppsf":451,"sale_to_list":87.2,"dom":202},{"mls":"70871993","unit":"513","closed":"2009-03-30","year":2009,"beds":"1 BR","bedrooms":1,"baths":1,"sqft":758,"floor":5,"parking":"With parking","spaces":2,"list_price":485000,"sale_price":460000,"ppsf":607,"sale_to_list":94.8,"dom":28},{"mls":"70760771","unit":"110","closed":"2009-01-22","year":2009,"beds":"1 BR","bedrooms":1,"baths":2,"sqft":1207,"floor":1,"parking":"With parking","spaces":2,"list_price":509000,"sale_price":491750,"ppsf":407,"sale_to_list":96.6,"dom":188},{"mls":"70746418","unit":"306","closed":"2008-10-15","year":2008,"beds":"2 BR","bedrooms":2,"baths":2,"sqft":1129,"floor":3,"parking":"With parking","spaces":2,"list_price":559000,"sale_price":530000,"ppsf":469,"sale_to_list":94.8,"dom":119},{"mls":"70770498","unit":"413","closed":"2008-08-28","year":2008,"beds":"1 BR","bedrooms":1,"baths":1,"sqft":763,"floor":4,"parking":"With parking","spaces":2,"list_price":459000,"sale_price":437000,"ppsf":573,"sale_to_list":95.2,"dom":70},{"mls":"70741427","unit":"512","closed":"2008-08-21","year":2008,"beds":"2 BR","bedrooms":2,"baths":2,"sqft":1454,"floor":5,"parking":"With parking","spaces":2,"list_price":729000,"sale_price":714000,"ppsf":491,"sale_to_list":97.9,"dom":119},{"mls":"70725654","unit":"308","closed":"2008-08-01","year":2008,"beds":"1 BR","bedrooms":1,"baths":1,"sqft":896,"floor":3,"parking":"With parking","spaces":2,"list_price":450000,"sale_price":425000,"ppsf":474,"sale_to_list":94.4,"dom":106},{"mls":"70705078","unit":"202","closed":"2008-06-23","year":2008,"beds":"2 BR","bedrooms":2,"baths":2,"sqft":1149,"floor":2,"parking":"With parking","spaces":2,"list_price":569000,"sale_price":550000,"ppsf":479,"sale_to_list":96.7,"dom":40},{"mls":"70708649","unit":"111","closed":"2008-06-02","year":2008,"beds":"2 BR","bedrooms":2,"baths":2,"sqft":1285,"floor":1,"parking":"With parking","spaces":2,"list_price":529000,"sale_price":502500,"ppsf":391,"sale_to_list":95.0,"dom":22},{"mls":"70678497","unit":"105","closed":"2008-05-16","year":2008,"beds":"2 BR","bedrooms":2,"baths":2,"sqft":1285,"floor":1,"parking":"With parking","spaces":1,"list_price":549000,"sale_price":550000,"ppsf":428,"sale_to_list":100.2,"dom":134},{"mls":"70619183","unit":"206","closed":"2008-03-12","year":2008,"beds":"1 BR","bedrooms":1,"baths":2,"sqft":1130,"floor":2,"parking":"With parking","spaces":1,"list_price":549000,"sale_price":526000,"ppsf":465,"sale_to_list":95.8,"dom":180},{"mls":"70656924","unit":"506","closed":"2007-10-30","year":2007,"beds":"2 BR","bedrooms":2,"baths":2,"sqft":1137,"floor":5,"parking":"With parking","spaces":1,"list_price":589000,"sale_price":561250,"ppsf":494,"sale_to_list":95.3,"dom":30},{"mls":"70619166","unit":"213","closed":"2007-10-01","year":2007,"beds":"1 BR","bedrooms":1,"baths":1,"sqft":759,"floor":2,"parking":"With parking","spaces":1,"list_price":439000,"sale_price":376000,"ppsf":495,"sale_to_list":85.6,"dom":16},{"mls":"70611030","unit":"404","closed":"2007-09-20","year":2007,"beds":"2 BR","bedrooms":2,"baths":2,"sqft":1224,"floor":4,"parking":"With parking","spaces":2,"list_price":599000,"sale_price":530000,"ppsf":433,"sale_to_list":88.5,"dom":57},{"mls":"70578552","unit":"102","closed":"2007-08-15","year":2007,"beds":"1 BR","bedrooms":1,"baths":2,"sqft":1185,"floor":1,"parking":"With parking","spaces":2,"list_price":549000,"sale_price":518000,"ppsf":437,"sale_to_list":94.4,"dom":52},{"mls":"70468529","unit":"418","closed":"2007-07-31","year":2007,"beds":"1 BR","bedrooms":1,"baths":2,"sqft":837,"floor":4,"parking":"With parking","spaces":2,"list_price":425000,"sale_price":405000,"ppsf":484,"sale_to_list":95.3,"dom":170},{"mls":"70557085","unit":"422","closed":"2007-07-30","year":2007,"beds":"2 BR","bedrooms":2,"baths":2,"sqft":1322,"floor":4,"parking":"With parking","spaces":1,"list_price":629000,"sale_price":609000,"ppsf":461,"sale_to_list":96.8,"dom":61},{"mls":"70570172","unit":"510","closed":"2007-07-17","year":2007,"beds":"1 BR","bedrooms":1,"baths":2,"sqft":1192,"floor":5,"parking":"With parking","spaces":2,"list_price":612000,"sale_price":609000,"ppsf":511,"sale_to_list":99.5,"dom":10},{"mls":"70578066","unit":"501","closed":"2007-07-16","year":2007,"beds":"1 BR","bedrooms":1,"baths":2,"sqft":1113,"floor":5,"parking":"With parking","spaces":2,"list_price":660000,"sale_price":630000,"ppsf":566,"sale_to_list":95.4,"dom":42},{"mls":"70578507","unit":"424","closed":"2007-07-02","year":2007,"beds":"2 BR","bedrooms":2,"baths":2,"sqft":1224,"floor":4,"parking":"With parking","spaces":1,"list_price":649000,"sale_price":625000,"ppsf":511,"sale_to_list":96.3,"dom":4},{"mls":"70548372","unit":"207","closed":"2007-06-27","year":2007,"beds":"2 BR","bedrooms":2,"baths":2,"sqft":1498,"floor":2,"parking":"With parking","spaces":1,"list_price":699000,"sale_price":675000,"ppsf":451,"sale_to_list":96.6,"dom":4},{"mls":"70544387","unit":"404","closed":"2007-06-20","year":2007,"beds":"2 BR","bedrooms":2,"baths":2,"sqft":1224,"floor":4,"parking":"With parking","spaces":1,"list_price":620000,"sale_price":599000,"ppsf":489,"sale_to_list":96.6,"dom":2},{"mls":"70578482","unit":"613","closed":"2007-05-31","year":2007,"beds":"2 BR","bedrooms":2,"baths":3,"sqft":1716,"floor":6,"parking":"With parking","spaces":2,"list_price":1200000,"sale_price":1080000,"ppsf":629,"sale_to_list":90.0,"dom":19},{"mls":"70178260","unit":"604","closed":"2007-05-25","year":2007,"beds":"2 BR","bedrooms":2,"baths":3,"sqft":1746,"floor":6,"parking":"With parking","spaces":2,"list_price":949900,"sale_price":945000,"ppsf":541,"sale_to_list":99.5,"dom":43},{"mls":"70518382","unit":"304","closed":"2007-05-16","year":2007,"beds":"2 BR","bedrooms":2,"baths":2,"sqft":1224,"floor":3,"parking":"With parking","spaces":1,"list_price":571900,"sale_price":580000,"ppsf":474,"sale_to_list":101.4,"dom":38},{"mls":"70533852","unit":"311","closed":"2007-05-02","year":2007,"beds":"2 BR","bedrooms":2,"baths":2,"sqft":1283,"floor":3,"parking":"With parking","spaces":2,"list_price":614900,"sale_price":590000,"ppsf":460,"sale_to_list":96.0,"dom":51},{"mls":"70474605","unit":"113","closed":"2007-05-01","year":2007,"beds":"1 BR","bedrooms":1,"baths":1,"sqft":760,"floor":1,"parking":"With parking","spaces":2,"list_price":379000,"sale_price":400000,"ppsf":526,"sale_to_list":105.5,"dom":166},{"mls":"70425007","unit":"220","closed":"2007-03-16","year":2007,"beds":"2 BR","bedrooms":2,"baths":2,"sqft":1536,"floor":2,"parking":"With parking","spaces":1,"list_price":649000,"sale_price":635000,"ppsf":413,"sale_to_list":97.8,"dom":146},{"mls":"70526575","unit":"305","closed":"2007-02-28","year":2007,"beds":"1 BR","bedrooms":1,"baths":2,"sqft":1282,"floor":3,"parking":"No parking","spaces":0,"list_price":649000,"sale_price":630000,"ppsf":491,"sale_to_list":97.1,"dom":1},{"mls":"70463296","unit":"410","closed":"2007-02-06","year":2007,"beds":"1 BR","bedrooms":1,"baths":2,"sqft":1195,"floor":4,"parking":"With parking","spaces":2,"list_price":595000,"sale_price":575000,"ppsf":481,"sale_to_list":96.6,"dom":67},{"mls":"70168812","unit":"522","closed":"2007-01-16","year":2007,"beds":"2 BR","bedrooms":2,"baths":2,"sqft":1328,"floor":5,"parking":"With parking","spaces":2,"list_price":689000,"sale_price":660000,"ppsf":497,"sale_to_list":95.8,"dom":201},{"mls":"70406413","unit":"507","closed":"2006-12-27","year":2006,"beds":"2 BR","bedrooms":2,"baths":2,"sqft":1478,"floor":5,"parking":"With parking","spaces":1,"list_price":699000,"sale_price":670000,"ppsf":453,"sale_to_list":95.8,"dom":153},{"mls":"70405499","unit":"308","closed":"2006-11-03","year":2006,"beds":"1 BR","bedrooms":1,"baths":1,"sqft":896,"floor":3,"parking":"No parking","spaces":0,"list_price":410000,"sale_price":395000,"ppsf":441,"sale_to_list":96.3,"dom":108},{"mls":"70385522","unit":"411","closed":"2006-10-12","year":2006,"beds":"1 BR","bedrooms":1,"baths":2,"sqft":1290,"floor":4,"parking":"With parking","spaces":2,"list_price":589000,"sale_price":550000,"ppsf":426,"sale_to_list":93.4,"dom":147},{"mls":"70344893","unit":"205","closed":"2006-07-21","year":2006,"beds":"2 BR","bedrooms":2,"baths":2,"sqft":1283,"floor":2,"parking":"With parking","spaces":2,"list_price":575000,"sale_price":590000,"ppsf":460,"sale_to_list":102.6,"dom":124},{"mls":"70173452","unit":"312","closed":"2006-06-09","year":2006,"beds":"2 BR","bedrooms":2,"baths":2,"sqft":1435,"floor":3,"parking":"With parking","spaces":2,"list_price":699000,"sale_price":681525,"ppsf":475,"sale_to_list":97.5,"dom":6},{"mls":"70340546","unit":"310","closed":"2006-05-31","year":2006,"beds":"1 BR","bedrooms":1,"baths":2,"sqft":1167,"floor":3,"parking":"No parking","spaces":0,"list_price":559000,"sale_price":559000,"ppsf":479,"sale_to_list":100.0,"dom":68},{"mls":"70286342","unit":"306","closed":"2006-05-19","year":2006,"beds":"2 BR","bedrooms":2,"baths":2,"sqft":1129,"floor":3,"parking":"With parking","spaces":1,"list_price":508000,"sale_price":480000,"ppsf":425,"sale_to_list":94.5,"dom":53},{"mls":"70294877","unit":"119","closed":"2006-05-19","year":2006,"beds":"1 BR","bedrooms":1,"baths":1,"sqft":710,"floor":1,"parking":"With parking","spaces":1,"list_price":375000,"sale_price":360000,"ppsf":507,"sale_to_list":96.0,"dom":147},{"mls":"70303312","unit":"209","closed":"2006-05-01","year":2006,"beds":"1 BR","bedrooms":1,"baths":1,"sqft":862,"floor":2,"parking":"With parking","spaces":2,"list_price":409900,"sale_price":396000,"ppsf":459,"sale_to_list":96.6,"dom":114},{"mls":"70302978","unit":"517","closed":"2006-03-20","year":2006,"beds":"1 BR","bedrooms":1,"baths":1,"sqft":782,"floor":5,"parking":"With parking","spaces":1,"list_price":463500,"sale_price":420000,"ppsf":537,"sale_to_list":90.6,"dom":53},{"mls":"70178220","unit":"523","closed":"2005-11-22","year":2005,"beds":"1 BR","bedrooms":1,"baths":1,"sqft":835,"floor":5,"parking":"With parking","spaces":2,"list_price":569000,"sale_price":502000,"ppsf":601,"sale_to_list":88.2,"dom":179},{"mls":"70200378","unit":"107","closed":"2005-09-15","year":2005,"beds":"2 BR","bedrooms":2,"baths":2,"sqft":1498,"floor":1,"parking":"No parking","spaces":0,"list_price":597500,"sale_price":575000,"ppsf":384,"sale_to_list":96.2,"dom":62},{"mls":"70177682","unit":"503","closed":"2005-09-09","year":2005,"beds":"2 BR","bedrooms":2,"baths":2,"sqft":1248,"floor":5,"parking":"With parking","spaces":1,"list_price":649000,"sale_price":625000,"ppsf":501,"sale_to_list":96.3,"dom":107},{"mls":"70207735","unit":"509","closed":"2005-08-05","year":2005,"beds":"1 BR","bedrooms":1,"baths":1,"sqft":870,"floor":5,"parking":"With parking","spaces":2,"list_price":519000,"sale_price":510000,"ppsf":586,"sale_to_list":98.3,"dom":16},{"mls":"70173285","unit":"606","closed":"2005-08-01","year":2005,"beds":"1 BR","bedrooms":1,"baths":2,"sqft":2192,"floor":6,"parking":"With parking","spaces":2,"list_price":1250000,"sale_price":1330000,"ppsf":607,"sale_to_list":106.4,"dom":30},{"mls":"70158345","unit":"421","closed":"2005-05-26","year":2005,"beds":"1 BR","bedrooms":1,"baths":1,"sqft":860,"floor":4,"parking":"With parking","spaces":1,"list_price":479000,"sale_price":520000,"ppsf":605,"sale_to_list":108.6,"dom":17},{"mls":"70160475","unit":"325","closed":"2005-05-20","year":2005,"beds":"2 BR","bedrooms":2,"baths":2,"sqft":1090,"floor":3,"parking":"With parking","spaces":1,"list_price":529000,"sale_price":529000,"ppsf":485,"sale_to_list":100.0,"dom":6},{"mls":"70168787","unit":"108","closed":"2005-05-16","year":2005,"beds":"Studio","bedrooms":0,"baths":1,"sqft":870,"floor":1,"parking":"With parking","spaces":2,"list_price":400000,"sale_price":400000,"ppsf":460,"sale_to_list":100.0,"dom":16},{"mls":"70153709","unit":"104","closed":"2005-05-16","year":2005,"beds":"2 BR","bedrooms":2,"baths":2,"sqft":1100,"floor":1,"parking":"With parking","spaces":1,"list_price":549000,"sale_price":530000,"ppsf":482,"sale_to_list":96.5,"dom":18},{"mls":"70153710","unit":"513","closed":"2005-05-13","year":2005,"beds":"1 BR","bedrooms":1,"baths":1,"sqft":700,"floor":5,"parking":"With parking","spaces":1,"list_price":424900,"sale_price":415000,"ppsf":593,"sale_to_list":97.7,"dom":32},{"mls":"70133237","unit":"309","closed":"2005-03-31","year":2005,"beds":"1 BR","bedrooms":1,"baths":1,"sqft":870,"floor":3,"parking":"With parking","spaces":1,"list_price":439000,"sale_price":427000,"ppsf":491,"sale_to_list":97.3,"dom":16},{"mls":"70114951","unit":"304","closed":"2005-01-18","year":2005,"beds":"2 BR","bedrooms":2,"baths":2,"sqft":1224,"floor":3,"parking":"With parking","spaces":1,"list_price":539000,"sale_price":534000,"ppsf":436,"sale_to_list":99.1,"dom":39},{"mls":"70109293","unit":"313","closed":"2005-01-12","year":2005,"beds":"1 BR","bedrooms":1,"baths":1,"sqft":750,"floor":3,"parking":"With parking","spaces":1,"list_price":399000,"sale_price":392000,"ppsf":523,"sale_to_list":98.2,"dom":10},{"mls":"70031960","unit":"101","closed":"2004-07-20","year":2004,"beds":"1 BR","bedrooms":1,"baths":2,"sqft":1120,"floor":1,"parking":"No parking","spaces":0,"list_price":399000,"sale_price":392000,"ppsf":350,"sale_to_list":98.2,"dom":42}];
-const RECENT = 2024, PARK_FROM = 2019;
+const DEFAULT_FROM = 2024;
 
 const med = (a) => { const s = a.filter((x) => x != null).sort((x, y) => x - y); if (!s.length) return null; const m = s.length >> 1; return Math.round(s.length % 2 ? s[m] : (s[m - 1] + s[m]) / 2); };
 const usd = (v) => v == null ? '—' : '$' + Math.round(v).toLocaleString('en-US');
 const int = (v) => v == null ? '—' : Number(v).toLocaleString('en-US');
 const cnt = (g, f) => g.filter(f).length;
 const byBeds = (n) => (r) => r.bedrooms === n;
-const hasPk = (r) => r.parking === 'With parking';
+const hasPk = (r) => r.spaces > 0;
+const pkLabel = (n) => n === 0 ? 'None' : n === 1 ? '1 space' : n + ' spaces';
+const vol = (g) => g.reduce((a, r) => a + r.sale_price, 0);
 const $ = (id) => document.getElementById(id);
-const BEDS = ['Studio', '1 BR', '2 BR', '3 BR'];
+const fmtDate = (s, opt) => new Date(s + 'T00:00:00').toLocaleDateString('en-US', opt || { month: 'short', day: 'numeric', year: 'numeric' });
 
-document.querySelectorAll('.recent').forEach((e) => e.textContent = RECENT);
-document.querySelectorAll('.parkfrom').forEach((e) => e.textContent = PARK_FROM);
-
-// Headline
 const years = SALES.map((r) => r.year);
-const rec = SALES.filter((r) => r.year >= RECENT);
-$('yr-range').textContent = Math.min(...years) + ' to ' + Math.max(...years);
-$('t-sales').textContent = int(SALES.length);
-$('t-med').textContent = usd(med(rec.map((r) => r.sale_price)));
-$('t-psf').textContent = usd(med(rec.map((r) => r.ppsf)));
-$('t-park').textContent = Math.round(100 * cnt(SALES, hasPk) / SALES.length) + '%';
-const lastClose = SALES.map((r) => r.closed).sort().pop();
-$('last-close').textContent = new Date(lastClose + 'T00:00:00').toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+const maxYear = Math.max(...years);
+$('yr-range').textContent = Math.min(...years) + ' to ' + maxYear;
+$('last-close').textContent = fmtDate(SALES.map((r) => r.closed).sort().pop(), { month: 'long', day: 'numeric', year: 'numeric' });
 
 const fill = (id, rows) => {
   const tb = $(id);
@@ -226,111 +143,68 @@ const fill = (id, rows) => {
   }
 };
 
-// By year
-const yearRows = [...new Set(years)].sort((a, b) => b - a).map((y) => {
-  const g = SALES.filter((r) => r.year === y), p = g.map((r) => r.sale_price);
-  return { year: y, sales: g.length, studio: cnt(g, byBeds(0)), one: cnt(g, byBeds(1)), two: cnt(g, byBeds(2)), three: cnt(g, byBeds(3)), pk: cnt(g, hasPk),
-    med: med(p), low: Math.min(...p), high: Math.max(...p), psf: med(g.map((r) => r.ppsf)), dom: med(g.map((r) => r.dom)) };
-});
-fill('year-body', yearRows.map((d) => [String(d.year), int(d.sales), int(d.studio), int(d.one), int(d.two), int(d.three), int(d.pk), usd(d.med), usd(d.low), usd(d.high), usd(d.psf), int(d.dom)]));
-
-// By beds
-fill('beds-body', BEDS.map((b) => {
-  const g = SALES.filter((r) => r.beds === b);
-  if (!g.length) return null;
-  const p = g.map((r) => r.sale_price), rg = g.filter((r) => r.year >= RECENT);
-  return [b, int(g.length), int(med(g.map((r) => r.sqft))), usd(med(p)), usd(Math.min(...p)), usd(Math.max(...p)), usd(med(g.map((r) => r.ppsf))), int(rg.length), usd(med(rg.map((r) => r.sale_price)))];
-}).filter(Boolean));
-
-// By floor
-fill('floor-body', [...new Set(SALES.map((r) => r.floor))].sort((a, b) => a - b).map((f) => {
-  const g = SALES.filter((r) => r.floor === f);
-  return [String(f), int(g.length), int(cnt(g, byBeds(0))), int(cnt(g, byBeds(1))), int(cnt(g, byBeds(2))), int(cnt(g, byBeds(3))), int(cnt(g, hasPk)), usd(med(g.map((r) => r.sale_price))), usd(med(g.map((r) => r.ppsf)))];
-}));
-
-// Parking
-const parkRow = (label, g) => {
-  const w = g.filter(hasPk), n = g.filter((r) => !hasPk(r));
-  const w19 = w.filter((r) => r.year >= PARK_FROM), n19 = n.filter((r) => r.year >= PARK_FROM);
-  const wm = med(w19.map((r) => r.sale_price)), nm = med(n19.map((r) => r.sale_price));
-  const diff = wm != null && nm != null ? wm - nm : null;
-  return [label, int(w.length), int(n.length), usd(wm), usd(nm),
-    [diff == null ? '—' : (diff >= 0 ? '+' : '−') + usd(Math.abs(diff)), diff > 0 ? 'pos' : ''],
-    usd(med(w19.map((r) => r.ppsf))), usd(med(n19.map((r) => r.ppsf)))];
-};
-fill('park-body', [...BEDS.map((b) => SALES.filter((r) => r.beds === b)).map((g, i) => g.length ? parkRow(BEDS[i], g) : null).filter(Boolean), parkRow('All units', SALES)]);
-
-// All sales table
-const state = { q: '', beds: '', pk: '', floor: '', key: 'closed', dir: -1 };
-const fmtDate = (s) => new Date(s + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-const pkGroup = (n) => Math.min(n, 3);
-const PK_LABEL = ['No parking', '1 space', '2 spaces', '3+ spaces'];
-const pkLabel = (n) => n === 0 ? 'None' : n === 1 ? '1 space' : n + ' spaces';
-
-// Recent sales
-const maxYear = Math.max(...years);
+// Period dropdown
 const periodSel = $('period');
-const ranges = [[maxYear - 1, 'Since ' + (maxYear - 1)], [maxYear - 2, 'Since ' + (maxYear - 2)], [maxYear - 4, 'Last 5 years (since ' + (maxYear - 4) + ')']];
 const ogR = document.createElement('optgroup'); ogR.label = 'Ranges';
-ranges.forEach(([v, t]) => ogR.appendChild(new Option(t, 'since:' + v)));
+[[maxYear - 1, 'Since ' + (maxYear - 1)], [maxYear - 2, 'Since ' + (maxYear - 2)], [maxYear - 4, 'Last 5 years (since ' + (maxYear - 4) + ')'], [0, 'All years']]
+  .forEach(([v, t]) => ogR.appendChild(new Option(t, 'since:' + v)));
 const ogY = document.createElement('optgroup'); ogY.label = 'Single year';
 [...new Set(years)].sort((a, b) => b - a).forEach((y) => ogY.appendChild(new Option(y === maxYear ? y + ' (year to date)' : String(y), 'year:' + y)));
 periodSel.append(ogR, ogY);
-periodSel.value = 'since:' + RECENT;
-const plural = (n, w) => n + ' ' + w + (n === 1 ? '' : 's');
-function totals(p, mixId, g) {
-  $(p + '-sales').textContent = int(g.length);
-  $(p + '-med').textContent = usd(med(g.map((r) => r.sale_price)));
-  $(p + '-psf').textContent = usd(med(g.map((r) => r.ppsf)));
-  $(p + '-sf').textContent = g.length ? int(med(g.map((r) => r.sqft))) + ' SF' : '—';
-  $(p + '-dom').textContent = int(med(g.map((r) => r.dom)));
-  const sp = g.map((r) => r.sale_to_list).filter((v) => v != null);
-  $(p + '-sp').textContent = sp.length ? (sp.reduce((a, b) => a + b, 0) / sp.length).toFixed(1) + '%' : '—';
-  const mix = [[0, 'studio'], [1, '1 BR'], [2, '2 BR'], [3, '3 BR']].map(([n, w]) => [cnt(g, byBeds(n)), w]).filter(([c]) => c).map(([c, w]) => c + ' ' + w);
-  $(mixId).textContent = g.length ? 'Mix: ' + mix.join(', ') + '. ' + cnt(g, hasPk) + ' of ' + plural(g.length, 'sale') + ' included parking. Total volume ' + usd(g.reduce((a, r) => a + r.sale_price, 0)) + '.' : 'No sales match these filters.';
-}
-function drawRecent() {
-  const [mode, yv] = periodSel.value.split(':'), y = Number(yv);
-  const g = SALES.filter((r) => mode === 'year' ? r.year === y : r.year >= y).sort((a, b) => b.closed.localeCompare(a.closed));
-  $('recent-count').textContent = (mode === 'year' ? 'Totals and medians for ' + y + (y === maxYear ? ' so far' : '') : 'Totals and medians since January ' + y) + '. Sales are listed newest first.';
-  totals('r', 'recent-mix', g);
-  fill('recent-body', g.map((r) => [fmtDate(r.closed), r.unit, String(r.floor), r.beds, int(r.baths), int(r.sqft), [pkLabel(r.spaces), 'left'],
-    usd(r.list_price), usd(r.sale_price), usd(r.ppsf), r.sale_to_list == null ? '—' : r.sale_to_list.toFixed(1) + '%', int(r.dom)]));
-}
-periodSel.addEventListener('change', drawRecent);
-drawRecent();
+periodSel.value = 'since:' + DEFAULT_FROM;
 
-function drawSales() {
-  const q = state.q.trim().toLowerCase();
+// Sales section
+const state = { beds: '', pk: '', floor: '', key: 'closed', dir: -1 };
+function draw() {
+  const [mode, yv] = periodSel.value.split(':'), y = Number(yv);
   const rows = SALES.filter((r) =>
-    (!q || String(r.unit).toLowerCase().includes(q) || String(r.mls).includes(q)) &&
-    (!state.beds || r.beds === state.beds) && (state.pk === '' || String(pkGroup(r.spaces)) === state.pk) &&
+    (mode === 'year' ? r.year === y : r.year >= y) &&
+    (!state.beds || r.beds === state.beds) &&
+    (state.pk === '' || String(Math.min(r.spaces, 3)) === state.pk) &&
     (!state.floor || String(r.floor) === state.floor));
+
+  $('t-sales').textContent = int(rows.length);
+  $('t-med').textContent = usd(med(rows.map((r) => r.sale_price)));
+  $('t-psf').textContent = usd(med(rows.map((r) => r.ppsf)));
+  $('t-sf').textContent = rows.length ? int(med(rows.map((r) => r.sqft))) + ' SF' : '—';
+  $('t-dom').textContent = int(med(rows.map((r) => r.dom)));
+  const sp = rows.map((r) => r.sale_to_list).filter((v) => v != null);
+  $('t-sp').textContent = sp.length ? (sp.reduce((a, b) => a + b, 0) / sp.length).toFixed(1) + '%' : '—';
+  const mix = [[0, 'studio'], [1, '1 BR'], [2, '2 BR'], [3, '3 BR']].map(([n, w]) => [cnt(rows, byBeds(n)), w]).filter(([c]) => c).map(([c, w]) => c + ' ' + w);
+  $('mix').textContent = rows.length
+    ? mix.join(', ') + '. ' + cnt(rows, hasPk) + ' of ' + rows.length + ' with parking. Total volume ' + usd(vol(rows)) + '.'
+    : 'No sales match these filters.';
+
   const k = state.key;
   rows.sort((a, b) => {
-    const x = a[k], y = b[k];
-    return (typeof x === 'number' && typeof y === 'number' ? x - y : String(x).localeCompare(String(y), 'en', { numeric: true })) * state.dir;
+    const x = a[k], z = b[k];
+    return (typeof x === 'number' && typeof z === 'number' ? x - z : String(x).localeCompare(String(z), 'en', { numeric: true })) * state.dir;
   });
-  fill('sales-body', rows.map((r) => [r.mls, r.unit, fmtDate(r.closed), r.beds, int(r.baths), int(r.sqft), String(r.floor),
-    [pkLabel(r.spaces), 'left'], usd(r.list_price), usd(r.sale_price), usd(r.ppsf),
-    r.sale_to_list == null ? '—' : r.sale_to_list.toFixed(1) + '%', int(r.dom)]));
-  $('shown').textContent = 'Showing ' + rows.length + ' of ' + SALES.length + '. Totals update with the search and filters.';
-  totals('a', 'a-mix', rows);
+  fill('sales-body', rows.map((r) => [fmtDate(r.closed), r.unit, String(r.floor), r.beds, int(r.baths), int(r.sqft), [pkLabel(r.spaces), 'left'],
+    usd(r.list_price), usd(r.sale_price), usd(r.ppsf), r.sale_to_list == null ? '—' : r.sale_to_list.toFixed(1) + '%', int(r.dom)]));
 }
-$('q').addEventListener('input', (e) => { state.q = e.target.value; drawSales(); });
-document.querySelectorAll('.f').forEach((s) => s.addEventListener('change', () => { state[s.dataset.k] = s.value; drawSales(); }));
+periodSel.addEventListener('change', draw);
+document.querySelectorAll('.f').forEach((s) => s.addEventListener('change', () => { state[s.dataset.k] = s.value; draw(); }));
 document.querySelectorAll('.sort').forEach((btn) => btn.addEventListener('click', () => {
   const k = btn.dataset.k;
-  if (state.key === k) state.dir *= -1; else { state.key = k; state.dir = (k === 'mls' || k === 'unit') ? 1 : -1; }
-  document.querySelectorAll('#all-sales th').forEach((th) => th.removeAttribute('aria-sort'));
+  if (state.key === k) state.dir *= -1; else { state.key = k; state.dir = k === 'unit' ? 1 : -1; }
+  document.querySelectorAll('#sales th').forEach((th) => th.removeAttribute('aria-sort'));
   btn.closest('th').setAttribute('aria-sort', state.dir === 1 ? 'ascending' : 'descending');
-  drawSales();
+  draw();
 }));
-drawSales();
+draw();
+
+// Year by year
+const yearRows = [...new Set(years)].sort((a, b) => b - a).map((y) => {
+  const g = SALES.filter((r) => r.year === y);
+  return { year: y, sales: g.length, one: cnt(g, byBeds(1)), two: cnt(g, byBeds(2)), other: cnt(g, (r) => r.bedrooms !== 1 && r.bedrooms !== 2),
+    pk: cnt(g, hasPk), med: med(g.map((r) => r.sale_price)), psf: med(g.map((r) => r.ppsf)), dom: med(g.map((r) => r.dom)), vol: vol(g) };
+});
+fill('year-body', yearRows.map((d) => [d.year === maxYear ? d.year + ' YTD' : String(d.year), int(d.sales), int(d.one), int(d.two), int(d.other), int(d.pk), usd(d.med), usd(d.psf), int(d.dom), usd(d.vol)]));
 
 // Chart (plain SVG, no libraries)
 const NS = 'http://www.w3.org/2000/svg';
-const el = (tag, attrs, parent, text) => { const n = document.createElementNS(NS, tag); for (const k in attrs) n.setAttribute(k, attrs[k]); if (text != null) n.textContent = text; if (parent) parent.appendChild(n); return n; };
+const el = (tag, attrs, parent, text) => { const n = document.createElementNS(NS, tag); for (const a in attrs) n.setAttribute(a, attrs[a]); if (text != null) n.textContent = text; if (parent) parent.appendChild(n); return n; };
 function drawChart() {
   const box = $('year-chart'), tip = $('tip');
   box.querySelectorAll('svg').forEach((s) => s.remove());
@@ -340,7 +214,7 @@ function drawChart() {
   const stepV = max > 1500000 ? 500000 : 250000;
   const yMax = Math.ceil(max * 1.05 / stepV) * stepV;
   const ticks = []; for (let v = 0; v <= yMax; v += stepV) ticks.push(v);
-  const yFmt = (v) => v === 0 ? '$0' : v >= 1e6 ? '$' + (v / 1e6).toFixed(v % 1e6 ? 2 : 0).replace(/0$/, '') + 'M' : '$' + v / 1000 + 'K';
+  const yFmt = (v) => v === 0 ? '$0' : v >= 1e6 ? '$' + String(+(v / 1e6).toFixed(2)) + 'M' : '$' + v / 1000 + 'K';
   const svg = el('svg', { width: '100%', viewBox: `0 0 ${W} ${H}`, style: 'display:block' });
   box.insertBefore(svg, tip);
   let left = 0;
@@ -356,13 +230,13 @@ function drawChart() {
   const every = Math.ceil(data.length / Math.max(1, Math.floor((W - left) / 42)));
   const bars = data.map((d, i) => {
     const cx = left + band * i + band / 2;
-    const r = el('rect', { x: cx - bw / 2, y: y(d.med), width: bw, height: y(0) - y(d.med), rx: 2, fill: '#1f4e79' }, svg);
+    const r = el('rect', { x: cx - bw / 2, y: y(d.med), width: bw, height: y(0) - y(d.med), rx: 2, fill: '#1f4e79', style: 'cursor:pointer' }, svg);
     if (i % every === 0 || i === data.length - 1) el('text', { x: cx, y: H - 8, 'text-anchor': 'middle', fill: '#6b6a65', 'font-size': 12 }, svg, String(d.year));
     const show = (ev) => {
       bars.forEach((b) => b.setAttribute('opacity', b === r ? 1 : 0.45));
-      tip.innerHTML = '';
+      tip.replaceChildren();
       const add = (t, c) => { const dv = document.createElement('div'); dv.textContent = t; if (c) dv.className = c; tip.appendChild(dv); };
-      add(String(d.year), 'k'); add('Median ' + usd(d.med)); add(d.sales + (d.sales === 1 ? ' sale' : ' sales')); add('Median ' + usd(d.psf) + '/SF');
+      add(d.year === maxYear ? d.year + ' (year to date)' : String(d.year), 'k'); add('Median ' + usd(d.med)); add(d.sales + (d.sales === 1 ? ' sale' : ' sales')); add('Median ' + usd(d.psf) + '/SF');
       tip.style.display = 'block';
       const rect = box.getBoundingClientRect();
       const mx = (ev.touches ? ev.touches[0].clientX : ev.clientX) - rect.left;
@@ -373,6 +247,8 @@ function drawChart() {
     r.addEventListener('mousemove', show);
     r.addEventListener('touchstart', show, { passive: true });
     r.addEventListener('mouseleave', () => { bars.forEach((b) => b.setAttribute('opacity', 1)); tip.style.display = 'none'; });
+    // Click a bar to load that year in the Sales section above
+    r.addEventListener('click', () => { periodSel.value = 'year:' + d.year; draw(); $('sales').scrollIntoView({ behavior: 'smooth' }); });
     return r;
   });
   el('line', { x1: left, x2: W - right, y1: y(0), y2: y(0), stroke: '#b9b8b3' }, svg);
