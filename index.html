@@ -67,6 +67,28 @@
     <div class="card"><span class="tile-label">Sales that included parking</span><span class="big" id="t-park"></span></div>
   </div>
 
+  <section class="card" id="recent-sales">
+    <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:baseline;justify-content:space-between">
+      <h2>Recent sales</h2>
+      <div class="controls">
+        <select id="period" aria-label="Period"></select>
+      </div>
+    </div>
+    <p class="muted"><span id="recent-count"></span> Parking is shown as the number of spaces on the listing.</p>
+    <div class="scroll">
+      <table>
+        <thead><tr><th>Parking</th><th>Sales</th><th>Studio</th><th>1 BR</th><th>2 BR</th><th>3 BR</th><th>Median price</th><th>Median $/SF</th></tr></thead>
+        <tbody id="recent-park-body"></tbody>
+      </table>
+    </div>
+    <div class="scroll">
+      <table>
+        <thead><tr><th>Closed</th><th>Unit</th><th>Floor</th><th>Beds</th><th>Baths</th><th>SF</th><th class="left">Parking</th><th>List price</th><th>Sale price</th><th>$/SF</th><th>SP/LP %</th><th>DOM</th></tr></thead>
+        <tbody id="recent-body"></tbody>
+      </table>
+    </div>
+  </section>
+
   <section class="card">
     <h2>By year</h2>
     <p class="muted">Median sale price per year. Hover or tap a bar for details.</p>
@@ -120,7 +142,7 @@
     <div class="controls">
       <input id="q" type="search" placeholder="Search unit or MLS #" aria-label="Search">
       <select class="f" data-k="beds" aria-label="Bedrooms"><option value="">All beds</option><option>Studio</option><option>1 BR</option><option>2 BR</option><option>3 BR</option></select>
-      <select class="f" data-k="parking" aria-label="Parking"><option value="">Parking or not</option><option>With parking</option><option>No parking</option></select>
+      <select class="f" data-k="pk" aria-label="Parking"><option value="">Any parking</option><option value="0">No parking</option><option value="1">1 space</option><option value="2">2 spaces</option><option value="3">3+ spaces</option></select>
       <select class="f" data-k="floor" aria-label="Floor"><option value="">All floors</option><option value="1">Floor 1</option><option value="2">Floor 2</option><option value="3">Floor 3</option><option value="4">Floor 4</option><option value="5">Floor 5</option><option value="6">Floor 6</option></select>
     </div>
     <div class="scroll tall">
@@ -224,13 +246,37 @@ const parkRow = (label, g) => {
 fill('park-body', [...BEDS.map((b) => SALES.filter((r) => r.beds === b)).map((g, i) => g.length ? parkRow(BEDS[i], g) : null).filter(Boolean), parkRow('All units', SALES)]);
 
 // All sales table
-const state = { q: '', beds: '', parking: '', floor: '', key: 'closed', dir: -1 };
+const state = { q: '', beds: '', pk: '', floor: '', key: 'closed', dir: -1 };
 const fmtDate = (s) => new Date(s + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+const pkGroup = (n) => Math.min(n, 3);
+const PK_LABEL = ['No parking', '1 space', '2 spaces', '3+ spaces'];
+const pkLabel = (n) => n === 0 ? 'None' : n === 1 ? '1 space' : n + ' spaces';
+
+// Recent sales
+const maxYear = Math.max(...years);
+const periodSel = $('period');
+[[maxYear, 'This year (' + maxYear + ')'], [maxYear - 1, 'Since ' + (maxYear - 1)], [RECENT, 'Since ' + RECENT], [maxYear - 4, 'Last 5 years (since ' + (maxYear - 4) + ')']]
+  .filter((v, i, a) => a.findIndex((w) => w[0] === v[0]) === i)
+  .forEach(([v, t]) => periodSel.appendChild(new Option(t, v)));
+periodSel.value = String(RECENT);
+function drawRecent() {
+  const from = Number(periodSel.value);
+  const g = SALES.filter((r) => r.year >= from).sort((a, b) => b.closed.localeCompare(a.closed));
+  $('recent-count').textContent = g.length + (g.length === 1 ? ' sale' : ' sales') + ' since January ' + from + ', newest first.';
+  const groups = [0, 1, 2, 3].map((k) => [k, g.filter((r) => pkGroup(r.spaces) === k)]).filter(([, x]) => x.length);
+  fill('recent-park-body', [...groups.map(([k, x]) => [PK_LABEL[k], int(x.length), int(cnt(x, byBeds(0))), int(cnt(x, byBeds(1))), int(cnt(x, byBeds(2))), int(cnt(x, byBeds(3))), usd(med(x.map((r) => r.sale_price))), usd(med(x.map((r) => r.ppsf)))]),
+    ['All', int(g.length), int(cnt(g, byBeds(0))), int(cnt(g, byBeds(1))), int(cnt(g, byBeds(2))), int(cnt(g, byBeds(3))), usd(med(g.map((r) => r.sale_price))), usd(med(g.map((r) => r.ppsf)))]]);
+  fill('recent-body', g.map((r) => [fmtDate(r.closed), r.unit, String(r.floor), r.beds, int(r.baths), int(r.sqft), [pkLabel(r.spaces), 'left'],
+    usd(r.list_price), usd(r.sale_price), usd(r.ppsf), r.sale_to_list == null ? '—' : r.sale_to_list.toFixed(1) + '%', int(r.dom)]));
+}
+periodSel.addEventListener('change', drawRecent);
+drawRecent();
+
 function drawSales() {
   const q = state.q.trim().toLowerCase();
   const rows = SALES.filter((r) =>
     (!q || String(r.unit).toLowerCase().includes(q) || String(r.mls).includes(q)) &&
-    (!state.beds || r.beds === state.beds) && (!state.parking || r.parking === state.parking) &&
+    (!state.beds || r.beds === state.beds) && (state.pk === '' || String(pkGroup(r.spaces)) === state.pk) &&
     (!state.floor || String(r.floor) === state.floor));
   const k = state.key;
   rows.sort((a, b) => {
@@ -238,7 +284,7 @@ function drawSales() {
     return (typeof x === 'number' && typeof y === 'number' ? x - y : String(x).localeCompare(String(y), 'en', { numeric: true })) * state.dir;
   });
   fill('sales-body', rows.map((r) => [r.mls, r.unit, fmtDate(r.closed), r.beds, int(r.baths), int(r.sqft), String(r.floor),
-    [hasPk(r) ? 'Yes (' + r.spaces + ')' : 'No', 'left'], usd(r.list_price), usd(r.sale_price), usd(r.ppsf),
+    [pkLabel(r.spaces), 'left'], usd(r.list_price), usd(r.sale_price), usd(r.ppsf),
     r.sale_to_list == null ? '—' : r.sale_to_list.toFixed(1) + '%', int(r.dom)]));
   $('shown').textContent = 'Showing ' + rows.length + ' of ' + SALES.length + '.';
 }
